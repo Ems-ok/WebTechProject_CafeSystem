@@ -92,6 +92,13 @@ pipeline {
     }
   }
   post {
+   success {
+        emailext(
+          subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+          body: "Build success.\nURL: ${env.BUILD_URL}",
+          to: "emma.okeeffe.25@gmail.com"
+        )
+      }
     failure {
       emailext(
         subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
