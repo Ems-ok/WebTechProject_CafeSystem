@@ -63,7 +63,7 @@ pipeline {
     stage('SonarQube Analysis') {
       steps {
         withSonarQubeEnv('LocalSonar') {
-          sh 'mvn -B sonar:sonar -Dsonar.projectKey=simple-java-maven-app'
+          sh 'mvn -B sonar:sonar -Dsonar.projectKey=Cafe-System'
         }
       }
     }
