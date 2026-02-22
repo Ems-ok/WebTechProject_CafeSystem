@@ -112,21 +112,20 @@
 				</configuration>
 			</plugin>
 
-			<!-- If you really want a custom manifest/classpath jar layout -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.4.2</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-							<mainClass>${start-class}</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<version>3.4.2</version>
+			<configuration>
+				<archive>
+					<manifest>
+						<addClasspath>true</addClasspath>
+						<classpathPrefix>lib/</classpathPrefix>
+						<mainClass>com.mycompany.app.App</mainClass>
+					</manifest>
+				</archive>
+			</configuration>
+		</plugin>
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
