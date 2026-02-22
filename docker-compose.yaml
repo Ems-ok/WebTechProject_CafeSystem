@@ -1,4 +1,4 @@
-name: ci-cd
+name: ci-cd-web-tech
 services:
   jenkins:
     image: jenkins/jenkins:2.551
