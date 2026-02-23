@@ -1,4 +1,4 @@
 package com.mase.cafe.system.controllers;
 
-public class test2 {
+public class Test2 {
 }

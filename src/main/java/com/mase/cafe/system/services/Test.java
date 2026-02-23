@@ -1,4 +1,4 @@
 package com.mase.cafe.system.services;
 
-public class test {
+public class Test {
 }

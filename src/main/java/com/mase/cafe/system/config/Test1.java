@@ -1,4 +1,4 @@
 package com.mase.cafe.system.config;
 
-public class test {
+public class Test1 {
 }
