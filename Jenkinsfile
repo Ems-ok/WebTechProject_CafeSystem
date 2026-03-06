@@ -32,12 +32,6 @@ pipeline {
       }
     }
 
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
-    }
-
     stage('Build, Test & Coverage') {
       steps {
         sh 'java -version'
