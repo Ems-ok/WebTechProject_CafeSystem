@@ -119,56 +119,125 @@ body.cafe-theme .main-content {
     );
 }
 
-[data-bs-theme="dark"] body.cafe-theme {
-    background:
-            radial-gradient(1200px 800px at 20% 10%, rgba(192,132,87,0.14), transparent 55%),
-            radial-gradient(1000px 700px at 90% 30%, rgba(0,0,0,0.30), transparent 55%),
-            linear-gradient(180deg, #0b1220, #0f172a);
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-[data-bs-theme="dark"] .sidebar {
-    background-color: #1a120d;
-    border-right: 1px solid rgba(255,255,255,0.08);
+.login-page .card {
+    width: 100%;
+    max-width: 420px;
+    padding: 28px;
+}
+#userTable .edit-btn {
+    background: linear-gradient(135deg, var(--cafe-cocoa), var(--cafe-caramel));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
-[data-bs-theme="dark"] .sidebar .nav-link {
-    color: #e6d5c3;
+#userTable .edit-btn:hover {
+    background: linear-gradient(135deg, #4a2f22, #b8754f);
+    color: #fff;
+    transform: translateY(-1px);
 }
 
-[data-bs-theme="dark"] .sidebar .nav-link.active {
+#userTable .delete-btn {
+    background: linear-gradient(135deg, #dc3545, #b02a37); /* Red tone for delete */
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+#userTable .delete-btn:hover {
+    background: linear-gradient(135deg, #a71d2a, #7f141e);
+    transform: translateY(-1px);
+}
+
+#saveUserBtn {
+    background: linear-gradient(135deg, var(--cafe-cocoa), var(--cafe-caramel));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 6px 20px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+
+#saveUserBtn:hover {
+    background: linear-gradient(135deg, #4a2f22, #b8754f);
+    transform: translateY(-1px);
+}
+
+#userModal .btn-secondary,
+#deleteUserModal .btn-secondary {
+    background: var(--cafe-foam);
+    color: var(--cafe-espresso);
+    border: 1px solid rgba(43,29,20,0.1);
+    border-radius: 12px;
+    padding: 6px 20px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+#userModal .btn-secondary:hover,
+#deleteUserModal .btn-secondary:hover {
+    background: var(--cafe-caramel);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+#userTable_paginate {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+#userTable_paginate .paginate_button {
+    border-radius: 12px; /* match your buttons */
+    border: none;
     background: linear-gradient(
             135deg,
             var(--cafe-cocoa),
             var(--cafe-caramel)
     );
-}
-
-[data-bs-theme="dark"] .card {
-    background: rgba(17,24,39,0.72);
-    border: 1px solid rgba(148,163,184,0.18);
-    box-shadow: 0 18px 60px rgba(0,0,0,0.35);
-}
-
-[data-bs-theme="dark"] .table {
-    --bs-table-border-color: #374151;
-    --bs-table-striped-bg: rgba(255, 255, 255, 0.05);
-    color: #e2e8f0;
-}
-
-[data-bs-theme="dark"] .table thead th {
-    background-color: #020617;
-    color: #f8fafc;
-    border-bottom: 2px solid #475569;
+    color: #fff !important;
+    padding: 6px 12px;
     font-weight: 600;
+    box-shadow: 0 4px 12px rgba(43,29,20,0.2);
+    transition: all 0.2s ease;
 }
 
-[data-bs-theme="dark"] .page-link {
-    background-color: #1e293b;
-    border-color: #374151;
-    color: #e2e8f0;
+#userTable_paginate .paginate_button:hover {
+    background: linear-gradient(
+            135deg,
+            #4a2f22,
+            #b8754f
+    );
+    box-shadow: 0 6px 18px rgba(43,29,20,0.25);
 }
 
-[data-bs-theme="dark"] .page-item.disabled .page-link {
-    background-color: #0f172a;
-    border-color: #374151;
+#userTable_paginate .paginate_button.current {
+    background: linear-gradient(
+            135deg,
+            var(--cafe-espresso),
+            var(--cafe-mocha)
+    );
+    color: #fff !important;
+    box-shadow: 0 6px 18px rgba(43,29,20,0.25);
+}
+
+#userTable.dataTable tbody tr:hover td {
+    background-color: var(--cafe-latte)!important;
 }
