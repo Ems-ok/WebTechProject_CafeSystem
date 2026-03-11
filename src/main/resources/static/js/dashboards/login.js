@@ -9,14 +9,14 @@ export function renderLoginPage(mainAppDiv) {
         
                 <form id="loginForm">
                     <div class="mb-2">
-                        <input type="text" class="form-control" name="username" placeholder="Username" required>
+                        <input  id="username" type="text" class="form-control" name="username" placeholder="Username" required>
                     </div>
         
                     <div class="mb-3">
-                        <input type="password" class="form-control" name="password" placeholder="Password" required>
+                        <input id="password" type="password" class="form-control" name="password" placeholder="Password" required>
                     </div>
         
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    <button id="submit" type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
             </div>
         
