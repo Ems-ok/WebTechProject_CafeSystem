@@ -87,7 +87,7 @@ class JwtServiceTest {
         try {
             valid = jwtService.validateToken(token, userDetails);
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            valid = false; // expired token → invalid
+            valid = false; // expired token - invalid
         }
 
         assertFalse(valid, "Expired token should be invalid");
