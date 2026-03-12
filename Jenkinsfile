@@ -60,7 +60,7 @@ pipeline {
         expression { params.RUN_UI_TESTS }
       }
       steps {
-        sh 'mvn verify -DskipUnitTests=true'
+        sh 'mvn verify -Pselenium'
       }
       post {
         always {
