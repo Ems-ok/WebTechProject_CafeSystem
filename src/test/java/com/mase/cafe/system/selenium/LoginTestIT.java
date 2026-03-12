@@ -23,6 +23,8 @@ public class LoginTestIT {
 
     @BeforeEach
     void setUp() {
+        WebDriverManager.chromedriver().setup();
+
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080");
         driver = new ChromeDriver(options);
