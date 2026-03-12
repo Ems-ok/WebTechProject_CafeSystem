@@ -27,6 +27,7 @@ public class RegistrationTestIT {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-infobars");
         options.addArguments("--disable-save-password-bubble");
+        options.addArguments("--headless");
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
         options.setExperimentalOption("prefs", Map.of(
                 "credentials_enable_service", false,
