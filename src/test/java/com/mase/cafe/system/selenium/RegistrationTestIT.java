@@ -60,7 +60,8 @@ public class RegistrationTestIT {
 
         addUserModal.findElement(By.id("saveUserBtn")).click();
 
-        wait.until(ExpectedConditions.invisibilityOf(addUserModal));
+        WebElement modal = driver.findElement(By.id("userModal"));
+        wait.until(driver1 -> !modal.isDisplayed());
 
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), "testuser"));
 
@@ -93,14 +94,12 @@ public class RegistrationTestIT {
 
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
         assertNotNull(alert);
-        String alertText = alert.getText();
-
-        assertTrue(alertText.contains("Username already exists"));
-
+        assertTrue(alert.getText().contains("Username already exists"));
         alert.accept();
 
-        wait.until(ExpectedConditions.invisibilityOf(addUserModal));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("saveUserBtn")));
 
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), "manager"));
     }
 
     @AfterEach
