@@ -24,8 +24,7 @@ public class LoginTestIT {
     void setUp() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080");
-        WebDriver driver = new ChromeDriver(options);
-        System.out.println("In setup");
+        driver = new ChromeDriver(options);
         driver = new ChromeDriver();
         driver.get("http://localhost:8080");
     }
