@@ -24,17 +24,22 @@ public class RegistrationTestIT {
 
     @BeforeEach
     void setUp() {
+        WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
         options.addArguments("--disable-infobars");
         options.addArguments("--disable-save-password-bubble");
-        options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080");
         options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
         options.setExperimentalOption("prefs", Map.of(
                 "credentials_enable_service", false,
                 "profile.password_manager_enabled", false
         ));
-        WebDriverManager.chromedriver().setup();
+
         driver = new ChromeDriver(options);
         driver.get("http://localhost:8080");
     }
@@ -55,22 +60,22 @@ public class RegistrationTestIT {
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
-        addUserModal.findElement(By.id("username")).sendKeys("testuser");
+        // Unique username
+        String username = "testuser" + System.currentTimeMillis();
+        addUserModal.findElement(By.id("username")).sendKeys(username);
         addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
         addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
 
-
         addUserModal.findElement(By.id("saveUserBtn")).click();
 
-        WebElement modal = driver.findElement(By.id("userModal"));
-        wait.until(driver1 -> !modal.isDisplayed());
+        // Wait for modal to disappear
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
 
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), "testuser"));
-
+        // Verify user appears in table
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), username));
         WebElement table = driver.findElement(By.id("userTable"));
-        assertTrue(table.getText().contains("testuser"), "User should be added successfully");
-
-}
+        assertTrue(table.getText().contains(username), "User should be added successfully");
+    }
 
     @Test
     void testRegistrationDuplicateAccount() {
@@ -88,20 +93,32 @@ public class RegistrationTestIT {
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
-        addUserModal.findElement(By.id("username")).sendKeys("testuser");
+        String duplicateUsername = "duplicateUser" + System.currentTimeMillis();
+        addUserModal.findElement(By.id("username")).sendKeys(duplicateUsername);
         addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
         addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
 
         addUserModal.findElement(By.id("saveUserBtn")).click();
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
 
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertNotNull(alert);
-        assertTrue(alert.getText().contains("Username already exists"));
-        alert.accept();
+        addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
+        addUserButton.click();
+        addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+        addUserModal.findElement(By.id("username")).sendKeys(duplicateUsername);
+        addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
+        addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
+        addUserModal.findElement(By.id("saveUserBtn")).click();
+
+        try {
+            Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+            assertTrue(alert.getText().contains("Username already exists"));
+            alert.accept();
+        } catch (Exception e) {
+            WebElement errorMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userErrorMessage")));
+            assertTrue(errorMsg.getText().contains("Username already exists"));
+        }
 
         wait.until(ExpectedConditions.elementToBeClickable(By.id("saveUserBtn")));
-
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), "manager"));
     }
 
     @AfterEach

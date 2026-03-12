@@ -26,9 +26,16 @@ public class LoginTestIT {
         WebDriverManager.chromedriver().setup();
 
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1080");
+        options.addArguments("--headless=new");
+        options.addArguments("--disable-gpu");
+        options.addArguments("--window-size=1920,1080");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--disable-infobars");
+        options.addArguments("--disable-save-password-bubble");
+
         driver = new ChromeDriver(options);
-        driver = new ChromeDriver();
+
         driver.get("http://localhost:8080");
     }
 
