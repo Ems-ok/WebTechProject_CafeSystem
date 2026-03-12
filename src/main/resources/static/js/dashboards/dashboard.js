@@ -1,6 +1,8 @@
-import {renderManagerDashboard} from "./managerDashboard.js";
+import { renderManagerDashboard } from "./managerDashboard.js";
+import { renderUserManagement } from "./userManagement.js";
 
 export function renderDashboard(mainAppDiv) {
+
     mainAppDiv.innerHTML = `
         <nav class="navbar navbar-dark navbar-expand-lg top-navbar" aria-label="Top Navigation">
             <div class="container-fluid">
@@ -10,9 +12,10 @@ export function renderDashboard(mainAppDiv) {
                     Mase Café
                 </a>
         
-                    <div class="m-0">
-                        <button id="logout_button" type="submit" class="btn btn-outline-light btn-sm">Logout</button>
-                    </div>
+                <div class="m-0">
+                    <button id="logout_button" type="button" class="btn btn-outline-light btn-sm">
+                        Logout
+                    </button>
                 </div>
         
             </div>
@@ -25,7 +28,11 @@ export function renderDashboard(mainAppDiv) {
                         <li class="nav-item role-restricted" data-allowed="MANAGER">
                             <a class="nav-link active" href="#" id="nav-dashboard">
                                 <i class="bi bi-speedometer2 me-2"></i>
-                                Dashboard
+                                Dashboard 
+                            </a> 
+                            <a class="nav-link active" href="#" id="nav-users">
+                                <i class="bi bi-person-fill-gear"></i>
+                                Users
                             </a>
                         </li>
                     </ul>
@@ -38,16 +45,21 @@ export function renderDashboard(mainAppDiv) {
         </div>
         
         <div id="modal-container"></div>
-        
-        <script type="module" src="/js/app.js"></script>
-        
-        </body>
-        </html>`;
-    const loginButton = document.getElementById("logout_button");
-    loginButton.addEventListener('click', () => {
-       localStorage.setItem("token", null);
-       window.location.reload();
+    `;
+
+    $("#logout_button").click(function () {
+        localStorage.removeItem("token");
+        window.location.reload();
     });
-    const dashboardRoot = document.getElementById('dashboard-root');
-    renderManagerDashboard(dashboardRoot)
+
+    $("#nav-dashboard").click(function (e) {
+        e.preventDefault();
+        renderManagerDashboard($("#dashboard-root")[0]);
+    });
+    $("#nav-users").click(function (e) {
+        e.preventDefault();
+        renderUserManagement($("#dashboard-root")[0]);
+    });
+
+    renderManagerDashboard($("#dashboard-root")[0]);
 }
