@@ -100,6 +100,12 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>com.intuit.karate</groupId>
+			<artifactId>karate-junit5</artifactId>
+			<version>1.4.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
@@ -228,7 +234,7 @@
 										<limit>
 											<counter>LINE</counter>
 											<value>COVEREDRATIO</value>
-											<minimum>0</minimum>
+											<minimum>80</minimum>
 										</limit>
 									</limits>
 								</rule>
