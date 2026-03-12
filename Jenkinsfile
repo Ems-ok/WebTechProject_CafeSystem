@@ -16,14 +16,15 @@ pipeline {
       defaultValue: false,
       description: 'Run Selenium UI tests'
     )
-        booleanParam(
-          name: 'RUN_API_TESTS',
-          defaultValue: true,
-          description: 'Run API (Karate) tests'
-        )
+    booleanParam(
+      name: 'RUN_API_TESTS',
+      defaultValue: true,
+      description: 'Run API (Karate) tests'
+    )
   }
 
   stages {
+
     stage('Secure Step') {
       steps {
         sh '''
@@ -37,17 +38,59 @@ pipeline {
       }
     }
 
-    stage('Build, Test & Coverage') {
+    stage('Build') {
       steps {
-        sh 'java -version'
-        sh 'mvn -v'
-        sh 'mvn -B clean verify'
+        sh 'mvn clean compile'
+      }
+    }
+
+    stage('Unit Tests (JUnit)') {
+      steps {
+        sh 'mvn test'
       }
       post {
         always {
-          junit allowEmptyResults: true,
-                testResults: 'target/surefire-reports/*.xml, target/failsafe-reports/*.xml'
+          junit 'target/surefire-reports/*.xml'
+        }
+      }
+    }
 
+    stage('UI Tests (Selenium)') {
+      when {
+        expression { params.RUN_UI_TESTS }
+      }
+      steps {
+        sh 'mvn verify -DskipUnitTests=true'
+      }
+      post {
+        always {
+          archiveArtifacts allowEmptyArchive: true,
+            artifacts: 'target/*.jar, target/screenshots/**'
+        }
+      }
+    }
+
+    stage('API Tests (Karate)') {
+      when {
+        expression { params.RUN_API_TESTS }
+      }
+      steps {
+        sh 'mvn test -Dtest=TestRunner'
+      }
+      post {
+        always {
+          junit 'target/surefire-reports/*.xml'
+          archiveArtifacts artifacts: 'target/karate-reports/**'
+        }
+      }
+    }
+
+    stage('Coverage') {
+      steps {
+        sh 'mvn jacoco:report'
+      }
+      post {
+        always {
           publishHTML(target: [
             reportDir: 'target/site/jacoco',
             reportFiles: 'index.html',
@@ -59,36 +102,10 @@ pipeline {
       }
     }
 
-        stage('UI Tests (Selenium)') {
-          when {
-            expression { params.RUN_UI_TESTS }
-          }
-          steps {
-            sh 'mvn -B verify -DskipUnitTests=true'
-          }
-          post {
-            always {
-              archiveArtifacts allowEmptyArchive: true,
-                    artifacts: 'target/*.jar, target/screenshots/**'
-            }
-          }
-        }
-        stage('API Tests (Karate)') {
-                    steps {
-                        sh 'mvn test -Dtest=TestRunner'
-                    }
-                    post {
-                        always {
-                            junit 'target/surefire-reports/*.xml'
-                            archiveArtifacts artifacts: 'target/karate-reports/**'
-                        }
-                    }
-                }
-
     stage('SonarQube Analysis') {
       steps {
         withSonarQubeEnv('LocalSonar') {
-          sh 'mvn -B sonar:sonar -Dsonar.projectKey=Cafe-System'
+          sh 'mvn sonar:sonar -Dsonar.projectKey=Cafe-System'
         }
       }
     }
@@ -103,13 +120,14 @@ pipeline {
   }
 
   post {
-   success {
-        emailext(
-          subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-          body: "Build success.\nURL: ${env.BUILD_URL}",
-          to: "emma.okeeffe.25@gmail.com"
-        )
-      }
+    success {
+      emailext(
+        subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+        body: "Build success.\nURL: ${env.BUILD_URL}",
+        to: "emma.okeeffe.25@gmail.com"
+      )
+    }
+
     failure {
       emailext(
         subject: "FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
@@ -117,6 +135,7 @@ pipeline {
         to: "emma.okeeffe.25@gmail.com"
       )
     }
+
     unstable {
       emailext(
         subject: "UNSTABLE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
