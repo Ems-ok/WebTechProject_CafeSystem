@@ -66,21 +66,20 @@ pipeline {
               }
     }
 
-           stage('UI Tests (Selenium)') {
-                when {
-                  expression { params.RUN_UI_TESTS }
-                }
-                steps {
-                  sh 'mvn -B verify -DskipUnitTests=true'
-                }
-                post {
-                  always {
-                    archiveArtifacts allowEmptyArchive: true,
-                          artifacts: 'target/*.jar, target/screenshots/**'
-                  }
-                }
-              }
+        stage('UI Tests (Selenium)') {
+            when {
+                expression { params.RUN_UI_TESTS }
             }
+            steps {
+                sh 'mvn -B verify -DskipUnitTests=true'
+            }
+            post {
+                always {
+                    archiveArtifacts allowEmptyArchive: true,
+                        artifacts: 'target/*.jar, target/screenshots/**'
+                }
+            }
+        }
 
     stage('SonarQube Analysis') {
       steps {
