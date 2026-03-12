@@ -1,0 +1,6 @@
+version: "3"
+tunnels:
+  jenkins:
+    proto: http
+    addr: 8083
+    domain: daily-lenient-kiwi.ngrok-free.app

@@ -16,6 +16,11 @@ pipeline {
       defaultValue: false,
       description: 'Run Selenium UI tests'
     )
+        booleanParam(
+          name: 'RUN_API_TESTS',
+          defaultValue: true,
+          description: 'Run API (Karate) tests'
+        )
   }
 
   stages {
