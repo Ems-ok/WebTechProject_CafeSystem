@@ -1,7 +1,7 @@
 package com.mase.cafe.system.selenium;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
@@ -24,6 +24,7 @@ public class RegistrationTestIT {
 
     @BeforeEach
     void setUp() {
+
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-infobars");
         options.addArguments("--disable-save-password-bubble");
@@ -33,6 +34,7 @@ public class RegistrationTestIT {
                 "credentials_enable_service", false,
                 "profile.password_manager_enabled", false
         ));
+        WebDriverManager.chromedriver().setup();
         driver = new ChromeDriver(options);
         driver.get("http://localhost:8080");
     }

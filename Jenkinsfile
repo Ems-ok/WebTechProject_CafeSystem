@@ -45,6 +45,9 @@ pipeline {
     }
 
     stage('Unit Tests (JUnit)') {
+      when {
+        expression { params.RUN_UI_TESTS }
+      }
       steps {
         sh 'mvn test'
       }
@@ -60,7 +63,7 @@ pipeline {
         expression { params.RUN_UI_TESTS }
       }
       steps {
-        sh 'mvn verify -Pselenium'
+        sh 'mvn verify'
       }
       post {
         always {
