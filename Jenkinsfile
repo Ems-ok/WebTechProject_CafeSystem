@@ -62,14 +62,9 @@ pipeline {
       when {
         expression { params.RUN_UI_TESTS }
       }
-        agent {
-          docker {
-            image 'selenium/standalone-chrome:latest'
-            args '-u root:root --shm-size=2g'
-          }
-        }
+
       steps {
-        sh 'mvn verify'
+        sh 'mvn verify -Pselenium'
       }
       post {
         always {
