@@ -49,7 +49,7 @@ pipeline {
         expression { params.RUN_UI_TESTS }
       }
       steps {
-        sh 'mvn test'
+        sh 'mvn test -Dparallel=none'
       }
       post {
         always {
@@ -57,6 +57,28 @@ pipeline {
         }
       }
     }
+
+        stage('API Tests (Karate)') {
+          when {
+            expression { params.RUN_API_TESTS }
+          }
+          steps {
+           sh 'mvn test -Dtest=KarateRunnerTestIT -Dparallel=none'
+          }
+          post {
+            always {
+              junit 'target/surefire-reports/*.xml'
+              archiveArtifacts artifacts: 'target/karate-reports/**'
+              publishHTML(target: [
+                reportDir: 'target/karate-reports',
+                reportFiles: 'karate-summary.html',
+                reportName: 'Karate Test Report',
+                keepAll: true,
+                alwaysLinkToLastBuild: true
+              ])
+            }
+          }
+        }
 
     stage('UI Tests (Selenium)') {
       when {
@@ -64,34 +86,12 @@ pipeline {
       }
 
       steps {
-        sh 'mvn verify -Pselenium -Dheadless=true'
+        sh 'mvn verify -P e2e -Dparallel=none'
       }
       post {
         always {
           archiveArtifacts allowEmptyArchive: true,
             artifacts: 'target/*.jar, target/screenshots/**'
-        }
-      }
-    }
-
-    stage('API Tests (Karate)') {
-      when {
-        expression { params.RUN_API_TESTS }
-      }
-      steps {
-       sh 'mvn test -Dtest=KarateRunnerTestIT'
-      }
-      post {
-        always {
-          junit 'target/surefire-reports/*.xml'
-          archiveArtifacts artifacts: 'target/karate-reports/**'
-          publishHTML(target: [
-            reportDir: 'target/karate-reports',
-            reportFiles: 'karate-summary.html',
-            reportName: 'Karate Test Report',
-            keepAll: true,
-            alwaysLinkToLastBuild: true
-          ])
         }
       }
     }
