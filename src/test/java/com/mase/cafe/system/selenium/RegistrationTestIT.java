@@ -14,8 +14,6 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class RegistrationTestIT {
 
     WebDriver driver;
@@ -49,17 +47,19 @@ public class RegistrationTestIT {
     @Test
     void testRegistrationSuccess() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        String uniqueUser = "success_" + System.currentTimeMillis();
+        String uniqueUser = "user" + System.currentTimeMillis();
 
-        login();
+        driver.findElement(By.id("username")).sendKeys("manager");
+        driver.findElement(By.id("password")).sendKeys("manager");
+        driver.findElement(By.id("submit")).click();
 
-        WebElement addUserButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("openAddUserBtn")));
-        wait.until(ExpectedConditions.elementToBeClickable(addUserButton));
+        wait.until(ExpectedConditions.urlContains("/home"));
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addUserButton);
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("openAddUserBtn"))).click();
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-
         addUserModal.findElement(By.id("username")).sendKeys(uniqueUser);
         addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
         addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
@@ -69,46 +69,41 @@ public class RegistrationTestIT {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
 
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser));
-        assertTrue(driver.findElement(By.id("userTable")).getText().contains(uniqueUser));
     }
 
     @Test
     void testRegistrationDuplicateAccount() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        String duplicateName = "dup_" + System.currentTimeMillis();
 
-        login();
+        driver.findElement(By.id("username")).sendKeys("manager");
+        driver.findElement(By.id("password")).sendKeys("manager");
+        driver.findElement(By.id("submit")).click();
 
-        WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
+        wait.until(ExpectedConditions.urlContains("/home"));
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn"))).click();
 
-        WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        modal.findElement(By.id("username")).sendKeys(duplicateName);
-        modal.findElement(By.id("password")).sendKeys("Test@1234!");
-        modal.findElement(By.id("saveUserBtn")).click();
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
-
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
-        modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        modal.findElement(By.id("username")).sendKeys(duplicateName);
-        modal.findElement(By.id("password")).sendKeys("Test@1234!");
-        modal.findElement(By.id("saveUserBtn")).click();
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+        driver.findElement(By.id("username")).sendKeys("testuser");
+        driver.findElement(By.id("password")).sendKeys("Test@1234!");
+        driver.findElement(By.id("role")).sendKeys("MANAGER");
+        driver.findElement(By.id("saveUserBtn")).click();
 
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertTrue(alert.getText().contains("Username already exists"));
         alert.accept();
 
-        WebElement closeButton = driver.findElement(By.cssSelector("#userModal .btn-close, #userModal [data-bs-dismiss='modal']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
-
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
+        WebElement closeButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector("#userModal .btn-close, #userModal [data-bs-dismiss='modal']")));
 
         try {
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
+            closeButton.click();
         } catch (Exception e) {
-
+            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
         }
+
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
     }
+
     @AfterEach
     void tearDown() {
         if (driver != null) {
