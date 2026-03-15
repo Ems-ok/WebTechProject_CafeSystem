@@ -64,7 +64,7 @@ pipeline {
       }
 
       steps {
-        sh 'mvn verify -Pselenium'
+        sh 'mvn verify -Pselenium -Dheadless=true'
       }
       post {
         always {
