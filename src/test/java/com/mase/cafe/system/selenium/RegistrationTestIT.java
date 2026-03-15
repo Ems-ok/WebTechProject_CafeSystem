@@ -53,11 +53,11 @@ public class RegistrationTestIT {
         driver.findElement(By.id("password")).sendKeys("manager");
         driver.findElement(By.id("submit")).click();
 
-        wait.until(ExpectedConditions.urlContains("/home"));
+        WebElement usersButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users")));
+        usersButton.click();
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
-
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("openAddUserBtn"))).click();
+        WebElement addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
+        addUserButton.click();
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
         addUserModal.findElement(By.id("username")).sendKeys(uniqueUser);
@@ -79,15 +79,19 @@ public class RegistrationTestIT {
         driver.findElement(By.id("password")).sendKeys("manager");
         driver.findElement(By.id("submit")).click();
 
-        wait.until(ExpectedConditions.urlContains("/home"));
+        WebElement usersButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users")));
+        usersButton.click();
+
+        WebElement addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
+        addUserButton.click();
+
+        WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
         wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn"))).click();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        driver.findElement(By.id("username")).sendKeys("testuser");
-        driver.findElement(By.id("password")).sendKeys("Test@1234!");
-        driver.findElement(By.id("role")).sendKeys("MANAGER");
-        driver.findElement(By.id("saveUserBtn")).click();
+        addUserModal.findElement(By.id("username")).sendKeys("testuser");
+        addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
+        addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
 
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
         alert.accept();
