@@ -60,9 +60,6 @@ pipeline {
     }
 
     stage('Unit Tests (JUnit)') {
-      when {
-        expression { params.RUN_UI_TESTS }
-      }
       steps {
         sh 'mvn test -Dparallel=none'
       }
