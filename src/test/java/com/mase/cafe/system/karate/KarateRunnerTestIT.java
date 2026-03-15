@@ -7,7 +7,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
-public class KarateRunnerTestIT{
+public class KarateRunnerTestIT {
 
 	@LocalServerPort
 	int randomServerPort;
@@ -16,6 +16,6 @@ public class KarateRunnerTestIT{
 	Karate testAllApiFeatures() {
 		System.setProperty("local.server.port", String.valueOf(randomServerPort));
 
-		return Karate.run("classpath:karate");
+		return Karate.run().relativeTo(getClass());
 	}
 }
