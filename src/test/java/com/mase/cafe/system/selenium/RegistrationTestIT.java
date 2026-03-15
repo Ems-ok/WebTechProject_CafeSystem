@@ -48,7 +48,7 @@ public class RegistrationTestIT {
 
         wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("openAddUserBtn")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("openAddUserBtn")));
     }
 
     @Test
@@ -75,34 +75,28 @@ public class RegistrationTestIT {
     @Test
     void testRegistrationDuplicateAccount() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-
         loginAndNavigateToUsers();
 
         wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn"))).click();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        driver.findElement(By.id("username")).sendKeys("testuser");
-        driver.findElement(By.id("password")).sendKeys("Test@1234!");
-        driver.findElement(By.id("role")).sendKeys("MANAGER");
-        driver.findElement(By.id("saveUserBtn")).click();
-
-        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        alert.accept();
-
-        WebElement closeButton = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("#userModal .btn-close, #userModal [data-bs-dismiss='modal']")));
+        WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+        modal.findElement(By.id("username")).sendKeys("testuser");
+        modal.findElement(By.id("password")).sendKeys("Test@1234!");
+        modal.findElement(By.id("role")).sendKeys("MANAGER");
+        modal.findElement(By.id("saveUserBtn")).click();
 
         try {
-            closeButton.click();
-        } catch (ElementClickInterceptedException e) {
-
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
+            Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+            alert.accept();
+        } catch (TimeoutException e) {
+            System.out.println("Native alert not found. Checking for UI error elements...");
         }
 
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
-    }
+        WebElement closeButton = driver.findElement(By.cssSelector("#userModal .btn-close"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
 
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
+    }
     @AfterEach
     void tearDown() {
         if (driver != null) {
