@@ -1,14 +1,5 @@
-
-html, body {
-    height: 100%;
-}
-
-body {
-    font-family: "Segoe UI", Roboto, sans-serif;
-    margin: 0;
-}
-
 :root {
+
     --cafe-espresso: #2b1d14;
     --cafe-mocha: #3b2a21;
     --cafe-cocoa: #5b3a29;
@@ -16,227 +7,98 @@ body {
     --cafe-latte: #f7efe5;
     --cafe-cream: #fff7ee;
     --cafe-foam: #f3e7d8;
+
+    --browser-blue: #0d6efd;
+    --blue-glow: rgba(13, 110, 253, 0.25);
+    --blue-subtle: rgba(13, 110, 253, 0.05);
 }
 
 body.cafe-theme {
     min-height: 100vh;
     background:
-            radial-gradient(1200px 800px at 20% 10%, rgba(192,132,87,0.16), transparent 55%),
-            radial-gradient(1000px 700px at 90% 30%, rgba(59,42,33,0.10), transparent 55%),
-            linear-gradient(180deg, var(--cafe-cream), var(--cafe-latte));
+            radial-gradient(1000px 700px at 90% 30%, rgba(192, 132, 87, 0.10), transparent 55%),
+            linear-gradient(180deg, var(--cafe-cream), var(--cafe-latte)) fixed;
 }
-
-body.cafe-theme::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background-image:
-            radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
-    background-size: 4px 4px;
-}
-
 .top-navbar {
-    background: linear-gradient(
-            135deg,
-            var(--cafe-espresso),
-            var(--cafe-mocha)
-    );
+    margin-bottom: 0 !important;
+    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
     border-bottom: 1px solid rgba(0,0,0,0.2);
+    padding: 10px 0;
+}
+
+.top-navbar .navbar-brand,
+.top-navbar .nav-link,
+.top-navbar h1,
+.top-navbar h5 {
+    color: var(--cafe-cream) !important;
 }
 
 .sidebar {
     height: calc(100vh - 56px);
-    padding-top: 1rem;
-    background: var(--cafe-foam);
-    border-right: 1px solid rgba(43,29,20,0.08);
+    position: sticky;
+    top: 56px !important;
+    background: var(--cafe-foam) !important;
+    border-right: 1px solid rgba(43, 29, 20, 0.1) !important;
+    padding-top: 15px !important;
+    z-index: 100;
 }
 
 .sidebar .nav-link {
     color: var(--cafe-espresso);
-    padding: 12px 20px;
-    border-radius: 10px;
-    margin: 4px 8px;
-    transition: all .15s ease;
-}
-
-.sidebar .nav-link:hover {
-    background: rgba(192,132,87,0.15);
-    color: var(--cafe-espresso);
+    margin: 4px 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
 }
 
 .sidebar .nav-link.active {
-    background: linear-gradient(
-            135deg,
-            var(--cafe-cocoa),
-            var(--cafe-caramel)
-    );
-    color: #fff;
+    background: var(--browser-blue) !important;
+    color: white !important;
+    box-shadow: 0 4px 10px var(--blue-glow);
+}
+
+.sidebar .nav-link:hover:not(.active) {
+    background: var(--blue-subtle);
+    color: var(--browser-blue);
 }
 
 .main-content {
-    padding: 20px;
+    padding: 30px;
     min-height: calc(100vh - 56px);
 }
 
 body.cafe-theme .main-content {
-    background:
-            radial-gradient(circle at 10% 10%, rgba(192,132,87,0.08), transparent 40%),
-            linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.25));
-    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    margin-left: 0 !important;
+    border-left: 1px solid rgba(43, 29, 20, 0.05);
+}
+
+.btn-primary, #saveUserBtn {
+    background: linear-gradient(135deg, var(--browser-blue), #0a58ca) !important;
+    border: none !important;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px var(--blue-glow);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--browser-blue) !important;
+    box-shadow: 0 0 0 0.25rem var(--blue-glow) !important;
+    outline: 0 !important;
 }
 
 .card {
-    border-radius: 16px;
-    background: rgba(255,255,255,0.78);
-    border: 1px solid rgba(43,29,20,0.08);
-    box-shadow:
-            0 18px 55px rgba(43,29,20,0.10),
-            0 2px 10px rgba(43,29,20,0.05);
-    backdrop-filter: blur(10px);
-}
-
-.btn-primary {
-    width: auto;
-    border: none;
     border-radius: 12px;
-    font-weight: 700;
-    color: white;
-    background: linear-gradient(
-            135deg,
-            var(--cafe-cocoa),
-            var(--cafe-caramel)
-    );
-    box-shadow: 0 6px 18px rgba(43,29,20,0.2);
-}
-
-.btn-primary:hover {
-    background: linear-gradient(
-            135deg,
-            #4a2f22,
-            #b8754f
-    );
-}
-
-.login-page {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.login-page .card {
-    width: 100%;
-    max-width: 420px;
-    padding: 28px;
-}
-#userTable .edit-btn {
-    background: linear-gradient(135deg, var(--cafe-cocoa), var(--cafe-caramel));
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 4px 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-#userTable .edit-btn:hover {
-    background: linear-gradient(135deg, #4a2f22, #b8754f);
-    color: #fff;
-    transform: translateY(-1px);
-}
-
-#userTable .delete-btn {
-    background: linear-gradient(135deg, #dc3545, #b02a37); /* Red tone for delete */
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 4px 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-#userTable .delete-btn:hover {
-    background: linear-gradient(135deg, #a71d2a, #7f141e);
-    transform: translateY(-1px);
-}
-
-#saveUserBtn {
-    background: linear-gradient(135deg, var(--cafe-cocoa), var(--cafe-caramel));
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 6px 20px;
-    font-weight: 700;
-    transition: all 0.2s ease;
-}
-
-#saveUserBtn:hover {
-    background: linear-gradient(135deg, #4a2f22, #b8754f);
-    transform: translateY(-1px);
-}
-
-#userModal .btn-secondary,
-#deleteUserModal .btn-secondary {
-    background: var(--cafe-foam);
-    color: var(--cafe-espresso);
-    border: 1px solid rgba(43,29,20,0.1);
-    border-radius: 12px;
-    padding: 6px 20px;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-#userModal .btn-secondary:hover,
-#deleteUserModal .btn-secondary:hover {
-    background: var(--cafe-caramel);
-    color: #fff;
-    transform: translateY(-1px);
-}
-
-#userTable_paginate {
-    margin-top: 16px;
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-}
-
-#userTable_paginate .paginate_button {
-    border-radius: 12px; /* match your buttons */
-    border: none;
-    background: linear-gradient(
-            135deg,
-            var(--cafe-cocoa),
-            var(--cafe-caramel)
-    );
-    color: #fff !important;
-    padding: 6px 12px;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(43,29,20,0.2);
-    transition: all 0.2s ease;
-}
-
-#userTable_paginate .paginate_button:hover {
-    background: linear-gradient(
-            135deg,
-            #4a2f22,
-            #b8754f
-    );
-    box-shadow: 0 6px 18px rgba(43,29,20,0.25);
-}
-
-#userTable_paginate .paginate_button.current {
-    background: linear-gradient(
-            135deg,
-            var(--cafe-espresso),
-            var(--cafe-mocha)
-    );
-    color: #fff !important;
-    box-shadow: 0 6px 18px rgba(43,29,20,0.25);
+    border: 1px solid rgba(43, 29, 20, 0.08);
+    overflow: hidden;
 }
 
 #userTable.dataTable tbody tr:hover td {
-    background-color: var(--cafe-latte)!important;
+    background-color: var(--blue-subtle) !important;
+    color: var(--browser-blue) !important;
+}
+
+::selection {
+    background-color: var(--browser-blue);
+    color: white;
 }
