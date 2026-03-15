@@ -53,7 +53,9 @@ public class RegistrationTestIT {
 
         login();
 
-        WebElement addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
+        WebElement addUserButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("openAddUserBtn")));
+        wait.until(ExpectedConditions.elementToBeClickable(addUserButton));
+
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addUserButton);
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
@@ -64,16 +66,15 @@ public class RegistrationTestIT {
 
         addUserModal.findElement(By.id("saveUserBtn")).click();
 
-        wait.until(ExpectedConditions.invisibilityOf(addUserModal));
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
 
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser));
         assertTrue(driver.findElement(By.id("userTable")).getText().contains(uniqueUser));
     }
 
     @Test
     void testRegistrationDuplicateAccount() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-
         String duplicateName = "dup_" + System.currentTimeMillis();
 
         login();
@@ -85,11 +86,10 @@ public class RegistrationTestIT {
         modal.findElement(By.id("username")).sendKeys(duplicateName);
         modal.findElement(By.id("password")).sendKeys("Test@1234!");
         modal.findElement(By.id("saveUserBtn")).click();
-        wait.until(ExpectedConditions.invisibilityOf(modal));
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
         modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-
         modal.findElement(By.id("username")).sendKeys(duplicateName);
         modal.findElement(By.id("password")).sendKeys("Test@1234!");
         modal.findElement(By.id("saveUserBtn")).click();
@@ -101,9 +101,14 @@ public class RegistrationTestIT {
         WebElement closeButton = driver.findElement(By.cssSelector("#userModal .btn-close, #userModal [data-bs-dismiss='modal']"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
 
-        wait.until(ExpectedConditions.invisibilityOf(modal));
-    }
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
 
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
+        } catch (Exception e) {
+
+        }
+    }
     @AfterEach
     void tearDown() {
         if (driver != null) {
