@@ -9,6 +9,15 @@ services:
       - jenkins_data:/var/jenkins_home
     restart: unless-stopped
 
+  selenium-chrome:
+    image: selenium/standalone-chrome:latest
+    shm_size: 2gb        # Critical: Prevents Chrome from crashing in Docker
+    ports:
+      - "4444:4444"      # The port Jenkins will use to talk to the browser
+      - "7900:7900"      # (Optional) You can go to localhost:7900 to see the browser live!
+    restart: unless-stopped
+
+
   sonarqube:
     image: sonarqube:26.2.0.119303-community
     depends_on:

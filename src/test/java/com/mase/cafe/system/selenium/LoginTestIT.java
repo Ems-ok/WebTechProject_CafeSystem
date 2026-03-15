@@ -1,6 +1,5 @@
 package com.mase.cafe.system.selenium;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,10 +9,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,21 +25,19 @@ public class LoginTestIT {
     WebDriver driver;
 
     @BeforeEach
-    void setUp() {
-        WebDriverManager.chromedriver().setup();
-
+    void setUp() throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
-        options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-infobars");
-        options.addArguments("--disable-save-password-bubble");
 
-        driver = new ChromeDriver(options);
+        options.setExperimentalOption("prefs", Map.of(
+                "credentials_enable_service", false,
+                "profile.password_manager_enabled", false,
+                "password_manager_leak_detection", false
+        ));
 
-        driver.get("http://localhost:8080");
+        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+        driver.get("http://host.docker.internal:8080");
     }
 
     @Test
@@ -85,10 +86,9 @@ public class LoginTestIT {
         String validationMessage = usernameField.getAttribute("validationMessage");
         assertTrue(validationMessage.contains("Please fill"));
 
-        driver.quit();
     }
 
-	@Test
+    @Test
     void testEmptyPassword() {
 
         driver.findElement(By.id("username")).sendKeys("test");
@@ -108,5 +108,3 @@ public class LoginTestIT {
         }
     }
 }
-
-

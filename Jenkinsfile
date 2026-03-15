@@ -86,7 +86,7 @@ pipeline {
       }
 
       steps {
-        sh 'mvn verify -P e2e -Dparallel=none'
+        sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none'
       }
       post {
         always {

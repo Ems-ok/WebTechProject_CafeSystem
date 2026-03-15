@@ -1,6 +1,5 @@
 package com.mase.cafe.system.selenium;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,11 +7,13 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
 
@@ -23,30 +24,25 @@ public class RegistrationTestIT {
     WebDriver driver;
 
     @BeforeEach
-    void setUp() {
-        WebDriverManager.chromedriver().setup();
-
+    void setUp() throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
-        options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--disable-infobars");
-        options.addArguments("--disable-save-password-bubble");
-        options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
+
         options.setExperimentalOption("prefs", Map.of(
                 "credentials_enable_service", false,
-                "profile.password_manager_enabled", false
+                "profile.password_manager_enabled", false,
+                "password_manager_leak_detection", false
         ));
 
-        driver = new ChromeDriver(options);
-        driver.get("http://localhost:8080");
+        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+        driver.get("http://host.docker.internal:8080");
     }
 
     @Test
     void testRegistrationSuccess() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        String uniqueUser = "user_" + System.currentTimeMillis();
 
         driver.findElement(By.id("username")).sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
@@ -60,18 +56,18 @@ public class RegistrationTestIT {
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
-        String username = "testuser" + System.currentTimeMillis();
-        addUserModal.findElement(By.id("username")).sendKeys(username);
+        addUserModal.findElement(By.id("username")).sendKeys(uniqueUser);
         addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
         addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
 
         addUserModal.findElement(By.id("saveUserBtn")).click();
 
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
+        wait.until(ExpectedConditions.invisibilityOf(addUserModal));
 
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), username));
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser));
+
         WebElement table = driver.findElement(By.id("userTable"));
-        assertTrue(table.getText().contains(username), "User should be added successfully");
+        assertTrue(table.getText().contains(uniqueUser), "Unique user should be in the table");
     }
 
     @Test
@@ -90,32 +86,21 @@ public class RegistrationTestIT {
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
-        String duplicateUsername = "duplicateUser" + System.currentTimeMillis();
-        addUserModal.findElement(By.id("username")).sendKeys(duplicateUsername);
+        addUserModal.findElement(By.id("username")).sendKeys("testuser");
         addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
         addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
 
         addUserModal.findElement(By.id("saveUserBtn")).click();
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
 
-        addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
-        addUserButton.click();
-        addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        addUserModal.findElement(By.id("username")).sendKeys(duplicateUsername);
-        addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
-        addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
-        addUserModal.findElement(By.id("saveUserBtn")).click();
+        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+        String alertText = alert.getText();
+        assertTrue(alertText.contains("Username already exists"));
+        alert.accept();
 
-        try {
-            Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-            assertTrue(alert.getText().contains("Username already exists"));
-            alert.accept();
-        } catch (Exception e) {
-            WebElement errorMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userErrorMessage")));
-            assertTrue(errorMsg.getText().contains("Username already exists"));
-        }
+        WebElement closeButton = driver.findElement(By.cssSelector("#userModal .btn-close, #userModal [data-bs-dismiss='modal']"));
+        closeButton.click();
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("saveUserBtn")));
+        wait.until(ExpectedConditions.invisibilityOf(addUserModal));
     }
 
     @AfterEach
