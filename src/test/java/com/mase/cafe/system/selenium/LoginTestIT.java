@@ -36,7 +36,7 @@ public class LoginTestIT {
                 "password_manager_leak_detection", false
         ));
 
-        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
+        driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
         driver.get("http://host.docker.internal:8080");
     }
 
