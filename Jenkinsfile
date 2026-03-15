@@ -24,6 +24,21 @@ pipeline {
   }
 
   stages {
+  stage('Start Ngrok Tunnel') {
+        steps {
+          sh '''
+              if pgrep -x "ngrok" > /dev/null
+              then
+                  echo "Ngrok is already running"
+              else
+
+                  nohup ngrok http --url=daily-lenient-kiwi.ngrok-free.app 8083 > ngrok.log 2>&1 &
+                  sleep 5
+                  echo "Ngrok started in background"
+              fi
+          '''
+        }
+      }
 
     stage('Secure Step') {
       steps {
