@@ -45,21 +45,23 @@ pipeline {
       }
     }
 
- stage('Setup Ngrok Tunnel') {
-       steps {
-         script {
+stage('Run App and Tunnel') {
+      steps {
+        script {
 
-             sh "ngrok config add-authtoken ${NGROK_TOKEN}"
+            sh 'mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8083 &'
 
-             sh 'ngrok http 8083 --domain=daily-lenient-kiwi.ngrok-free.app --log=stdout > ngrok.log &'
+            echo "Waiting for Cafe System to start..."
+            sleep 20
 
-             sleep 5
+            sh "ngrok config add-authtoken ${NGROK_TOKEN}"
+            sh 'ngrok http 8083 --domain=daily-lenient-kiwi.ngrok-free.app --log=stdout > ngrok.log &'
 
-             env.NGROK_URL = "https://daily-lenient-kiwi.ngrok-free.app"
-             echo "Ngrok Tunnel is live at: ${env.NGROK_URL}"
-         }
-       }
-     }
+            sleep 5
+            echo "Tunnel and App are both live."
+        }
+      }
+    }
 
     stage('Unit Tests (JUnit)') {
       when {
@@ -148,9 +150,10 @@ pipeline {
   }
 
   post {
-  always {
-        sh 'pkill ngrok || true'
-      }
+    always {
+      sh 'pkill ngrok || true'
+      sh 'pkill -f spring-boot || true'
+    }
     success {
       emailext(
         subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
