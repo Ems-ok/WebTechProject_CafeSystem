@@ -22,7 +22,7 @@ function initApp() {
 
         })
         .fail(function () {
-            window.location.href = '/login';
+            globalThis.location.href = '/login';
         });
 }
 

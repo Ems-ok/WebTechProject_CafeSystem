@@ -49,7 +49,7 @@ export function renderDashboard(mainAppDiv) {
 
     $("#logout_button").click(function () {
         localStorage.removeItem("token");
-        window.location.reload();
+        globalThis.location.reload();
     });
 
     $("#nav-dashboard").click(function (e) {

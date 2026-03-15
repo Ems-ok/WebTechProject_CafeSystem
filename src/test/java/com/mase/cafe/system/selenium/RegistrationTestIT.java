@@ -1,6 +1,7 @@
 package com.mase.cafe.system.selenium;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.*;
@@ -14,7 +15,10 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
 
-public class RegistrationTestIT {
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class RegistrationTestIT {
 
     WebDriver driver;
     private static final String APP_URL = "http://host.docker.internal:8080";
@@ -66,28 +70,25 @@ public class RegistrationTestIT {
         wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn"))).click();
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
-        WebElement nameInput = addUserModal.findElement(By.id("username"));
-        nameInput.clear();
-        nameInput.sendKeys(uniqueUser);
-
-        WebElement passInput = addUserModal.findElement(By.id("password"));
-        passInput.clear();
-        passInput.sendKeys("Test@1234!");
-
-        WebElement roleInput = addUserModal.findElement(By.id("role"));
-        roleInput.sendKeys("MANAGER");
+        addUserModal.findElement(By.id("username")).sendKeys(uniqueUser);
+        addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
+        addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
 
         WebElement saveBtn = addUserModal.findElement(By.id("saveUserBtn"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveBtn);
 
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser));
+        boolean isUserPresent = wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser));
+
+        assertTrue(isUserPresent, "The newly registered user should be visible in the user table.");
 
         try {
             wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
         } catch (TimeoutException e) {
-            System.out.println("Modal stuck due to animation. Forcing closure via JS.");
             ((JavascriptExecutor) driver).executeScript("$('#userModal').modal('hide');");
         }
+
+        boolean isModalGone = driver.findElement(By.id("userModal")).isDisplayed();
+        assertFalse(isModalGone, "The registration modal should be closed.");
     }
     @Test
     void testRegistrationDuplicateAccount() {
@@ -106,15 +107,24 @@ public class RegistrationTestIT {
 
         try {
             Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+            Assertions.assertNotNull(alert);
+            String alertText = alert.getText();
+
+            org.junit.jupiter.api.Assertions.assertTrue(alertText.toLowerCase().contains("exists") || alertText.toLowerCase().contains("duplicate"),
+                    "Alert text should indicate a duplicate account error, but was: " + alertText);
+
             alert.accept();
         } catch (TimeoutException e) {
-            System.out.println("No browser alert. Searching for validation text...");
+            System.out.println("No browser alert. Searching for UI validation text...");
 
+            WebElement errorMsg = driver.findElement(By.id("errorMessageId"));
+            org.junit.jupiter.api.Assertions.assertTrue(errorMsg.isDisplayed(), "Error message should be visible for duplicate registration.");
         }
 
         WebElement closeButton = driver.findElement(By.cssSelector("#userModal .btn-close, [data-bs-dismiss='modal']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
+        org.junit.jupiter.api.Assertions.assertTrue(modal.isDisplayed(), "Modal should remain open after a failed duplicate registration.");
 
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
     }
     @AfterEach
