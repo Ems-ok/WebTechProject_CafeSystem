@@ -44,13 +44,18 @@ public class RegistrationTestIT {
         WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
         userField.sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
-        driver.findElement(By.id("submit")).click();
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
+        WebElement submitBtn = driver.findElement(By.id("submit"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-users")));
+
+        WebElement navUsers = driver.findElement(By.id("nav-users"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navUsers);
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("openAddUserBtn")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("openAddUserBtn")));
     }
-
     @Test
     void testRegistrationSuccess() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
@@ -84,16 +89,19 @@ public class RegistrationTestIT {
         modal.findElement(By.id("username")).sendKeys("testuser");
         modal.findElement(By.id("password")).sendKeys("Test@1234!");
         modal.findElement(By.id("role")).sendKeys("MANAGER");
-        modal.findElement(By.id("saveUserBtn")).click();
+
+        WebElement saveBtn = modal.findElement(By.id("saveUserBtn"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveBtn);
 
         try {
             Alert alert = wait.until(ExpectedConditions.alertIsPresent());
             alert.accept();
         } catch (TimeoutException e) {
-            System.out.println("Native alert not found. Checking for UI error elements...");
+            System.out.println("No browser alert. Searching for validation text...");
+
         }
 
-        WebElement closeButton = driver.findElement(By.cssSelector("#userModal .btn-close"));
+        WebElement closeButton = driver.findElement(By.cssSelector("#userModal .btn-close, [data-bs-dismiss='modal']"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
 
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
