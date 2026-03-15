@@ -151,8 +151,10 @@ stage('Run App and Tunnel') {
 
   post {
     always {
-      sh 'pkill ngrok || true'
-      sh 'pkill -f spring-boot || true'
+      echo "Cleaning up background processes..."
+            sh 'pkill ngrok || true'
+            sh 'pkill -f spring-boot || true'
+            sh 'pkill -f maven || true'
     }
     success {
       emailext(
