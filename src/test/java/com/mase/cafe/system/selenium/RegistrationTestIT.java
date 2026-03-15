@@ -46,11 +46,9 @@ public class RegistrationTestIT {
         driver.findElement(By.id("password")).sendKeys("manager");
         driver.findElement(By.id("submit")).click();
 
-        WebElement usersButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users")));
-        usersButton.click();
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
 
-        WebElement addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
-        addUserButton.click();
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("openAddUserBtn")));
     }
 
     @Test
@@ -97,11 +95,11 @@ public class RegistrationTestIT {
         try {
             closeButton.click();
         } catch (ElementClickInterceptedException e) {
+
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
         }
 
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
-
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
     }
 
