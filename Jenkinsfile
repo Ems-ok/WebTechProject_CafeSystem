@@ -45,24 +45,6 @@ pipeline {
       }
     }
 
-stage('Run App and Tunnel') {
-      steps {
-        script {
-
-            sh 'mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8083 &'
-
-            echo "Waiting for Cafe System to start..."
-            sleep 20
-
-            sh "ngrok config add-authtoken ${NGROK_TOKEN}"
-            sh 'ngrok http 8083 --domain=daily-lenient-kiwi.ngrok-free.app --log=stdout > ngrok.log &'
-
-            sleep 5
-            echo "Tunnel and App are both live."
-        }
-      }
-    }
-
     stage('Unit Tests (JUnit)') {
       when {
         expression { params.RUN_UI_TESTS }
@@ -150,12 +132,6 @@ stage('Run App and Tunnel') {
   }
 
   post {
-    always {
-      echo "Cleaning up background processes..."
-            sh 'pkill ngrok || true'
-            sh 'pkill -f spring-boot || true'
-            sh 'pkill -f maven || true'
-    }
     success {
       emailext(
         subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
