@@ -14,10 +14,10 @@ Feature: User Management API
     And header Accept = 'application/json'
     When method get
     Then status 200
-    # Count number of users returned
+
     * def objectCount = karate.sizeOf(response)
     * print 'Number of users:', objectCount
-    # Validate each user object
+
     And match each response contains { id: '#number', username: '#string', role: '#string' }
 
 
@@ -35,10 +35,10 @@ Feature: User Management API
     """
     When method post
     Then status 201
-    # Capture the numeric ID of the created user
+
     * def createdUserId = response.id
     * print 'Created user ID:', createdUserId
-    # Verify response fields
+
     And match response contains { id: '#number', username: 'newuser', role: 'USER' }
 
 
