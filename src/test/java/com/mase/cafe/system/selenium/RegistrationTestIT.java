@@ -63,15 +63,16 @@ public class RegistrationTestIT {
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
         addUserModal.findElement(By.id("username")).sendKeys(uniqueUser);
         addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
-        addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
 
-        addUserModal.findElement(By.id("saveUserBtn")).click();
+        WebElement roleField = addUserModal.findElement(By.id("role"));
+        roleField.sendKeys("MANAGER");
+
+        WebElement saveBtn = addUserModal.findElement(By.id("saveUserBtn"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveBtn);
 
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
-
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser));
     }
-
     @Test
     void testRegistrationDuplicateAccount() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
