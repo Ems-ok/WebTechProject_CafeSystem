@@ -8,6 +8,7 @@ pipeline {
 
   environment {
     GITHUB_TOKEN = credentials('Github Credentials')
+    NGROK_TOKEN = credentials('NGROK_AUTHTOKEN')
   }
 
   parameters {
@@ -43,6 +44,22 @@ pipeline {
         sh 'mvn clean compile'
       }
     }
+
+ stage('Setup Ngrok Tunnel') {
+       steps {
+         script {
+
+             sh "ngrok config add-authtoken ${NGROK_TOKEN}"
+
+             sh 'ngrok http 8083 --domain=daily-lenient-kiwi.ngrok-free.app --log=stdout > ngrok.log &'
+
+             sleep 5
+
+             env.NGROK_URL = "https://daily-lenient-kiwi.ngrok-free.app"
+             echo "Ngrok Tunnel is live at: ${env.NGROK_URL}"
+         }
+       }
+     }
 
     stage('Unit Tests (JUnit)') {
       when {
@@ -131,6 +148,9 @@ pipeline {
   }
 
   post {
+  always {
+        sh 'pkill ngrok || true'
+      }
     success {
       emailext(
         subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
