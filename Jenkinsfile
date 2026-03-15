@@ -8,7 +8,6 @@ pipeline {
 
   environment {
     GITHUB_TOKEN = credentials('Github Credentials')
-    NGROK_TOKEN = credentials('NGROK_AUTHTOKEN')
   }
 
   parameters {
