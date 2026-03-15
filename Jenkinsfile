@@ -13,7 +13,7 @@ pipeline {
   parameters {
     booleanParam(
       name: 'RUN_UI_TESTS',
-      defaultValue: false,
+      defaultValue: true,
       description: 'Run Selenium UI tests'
     )
     booleanParam(
