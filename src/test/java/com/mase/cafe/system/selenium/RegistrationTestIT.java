@@ -17,6 +17,7 @@ import java.util.Map;
 public class RegistrationTestIT {
 
     WebDriver driver;
+    private static final String APP_URL = "http://host.docker.internal:8080";
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -25,6 +26,7 @@ public class RegistrationTestIT {
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--disable-gpu");
         options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
 
         options.setExperimentalOption("prefs", Map.of(
                 "credentials_enable_service", false,
@@ -33,23 +35,14 @@ public class RegistrationTestIT {
         ));
 
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
-        driver.get("http://host.docker.internal:8080");
+        driver.get(APP_URL);
     }
 
-    private void login() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))).sendKeys("manager");
-        driver.findElement(By.id("password")).sendKeys("manager");
-        driver.findElement(By.id("submit")).click();
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
-    }
-
-    @Test
-    void testRegistrationSuccess() {
+    private void loginAndNavigateToUsers() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        String uniqueUser = "user" + System.currentTimeMillis();
 
-        driver.findElement(By.id("username")).sendKeys("manager");
+        WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
+        userField.sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
         driver.findElement(By.id("submit")).click();
 
@@ -58,6 +51,16 @@ public class RegistrationTestIT {
 
         WebElement addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
         addUserButton.click();
+    }
+
+    @Test
+    void testRegistrationSuccess() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        String uniqueUser = "user" + System.currentTimeMillis();
+
+        loginAndNavigateToUsers();
+
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn"))).click();
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
         addUserModal.findElement(By.id("username")).sendKeys(uniqueUser);
@@ -75,23 +78,15 @@ public class RegistrationTestIT {
     void testRegistrationDuplicateAccount() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        driver.findElement(By.id("username")).sendKeys("manager");
-        driver.findElement(By.id("password")).sendKeys("manager");
-        driver.findElement(By.id("submit")).click();
+        loginAndNavigateToUsers();
 
-        WebElement usersButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users")));
-        usersButton.click();
-
-        WebElement addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
-        addUserButton.click();
-
-        WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
         wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn"))).click();
 
-        addUserModal.findElement(By.id("username")).sendKeys("testuser");
-        addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
-        addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+        driver.findElement(By.id("username")).sendKeys("testuser");
+        driver.findElement(By.id("password")).sendKeys("Test@1234!");
+        driver.findElement(By.id("role")).sendKeys("MANAGER");
+        driver.findElement(By.id("saveUserBtn")).click();
 
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
         alert.accept();
@@ -101,11 +96,13 @@ public class RegistrationTestIT {
 
         try {
             closeButton.click();
-        } catch (Exception e) {
-            ((org.openqa.selenium.JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
+        } catch (ElementClickInterceptedException e) {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
         }
 
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
+
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
     }
 
     @AfterEach
