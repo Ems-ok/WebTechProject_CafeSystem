@@ -3,7 +3,10 @@ package com.mase.cafe.system.selenium;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -25,8 +28,6 @@ public class RegistrationTestIT {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
         options.addArguments("--window-size=1920,1080");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--no-sandbox");
 
         options.setExperimentalOption("prefs", Map.of(
                 "credentials_enable_service", false,
@@ -38,25 +39,20 @@ public class RegistrationTestIT {
         driver.get("http://host.docker.internal:8080");
     }
 
-    private void login() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))).sendKeys("manager");
-        driver.findElement(By.id("password")).sendKeys("manager");
-        driver.findElement(By.id("submit")).click();
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users"))).click();
-    }
-
     @Test
     void testRegistrationSuccess() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        String uniqueUser = "success_" + System.currentTimeMillis();
+        String uniqueUser = "user_" + System.currentTimeMillis();
 
-        login();
+        driver.findElement(By.id("username")).sendKeys("manager");
+        driver.findElement(By.id("password")).sendKeys("manager");
+        driver.findElement(By.id("submit")).click();
 
-        WebElement addUserButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("openAddUserBtn")));
-        wait.until(ExpectedConditions.elementToBeClickable(addUserButton));
+        WebElement usersButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users")));
+        usersButton.click();
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addUserButton);
+        WebElement addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
+        addUserButton.click();
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
@@ -66,49 +62,47 @@ public class RegistrationTestIT {
 
         addUserModal.findElement(By.id("saveUserBtn")).click();
 
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
+        wait.until(ExpectedConditions.invisibilityOf(addUserModal));
 
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser));
-        assertTrue(driver.findElement(By.id("userTable")).getText().contains(uniqueUser));
+
+        WebElement table = driver.findElement(By.id("userTable"));
+        assertTrue(table.getText().contains(uniqueUser), "Unique user should be in the table");
     }
 
     @Test
     void testRegistrationDuplicateAccount() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        String duplicateName = "dup_" + System.currentTimeMillis();
 
-        login();
+        driver.findElement(By.id("username")).sendKeys("manager");
+        driver.findElement(By.id("password")).sendKeys("manager");
+        driver.findElement(By.id("submit")).click();
 
-        WebElement addButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
+        WebElement usersButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users")));
+        usersButton.click();
 
-        WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        modal.findElement(By.id("username")).sendKeys(duplicateName);
-        modal.findElement(By.id("password")).sendKeys("Test@1234!");
-        modal.findElement(By.id("saveUserBtn")).click();
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
+        WebElement addUserButton = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
+        addUserButton.click();
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", addButton);
-        modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        modal.findElement(By.id("username")).sendKeys(duplicateName);
-        modal.findElement(By.id("password")).sendKeys("Test@1234!");
-        modal.findElement(By.id("saveUserBtn")).click();
+        WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+
+        addUserModal.findElement(By.id("username")).sendKeys("testuser");
+        addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
+        addUserModal.findElement(By.id("role")).sendKeys("MANAGER");
+
+        addUserModal.findElement(By.id("saveUserBtn")).click();
 
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertTrue(alert.getText().contains("Username already exists"));
+        String alertText = alert.getText();
+        assertTrue(alertText.contains("Username already exists"));
         alert.accept();
 
         WebElement closeButton = driver.findElement(By.cssSelector("#userModal .btn-close, #userModal [data-bs-dismiss='modal']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", closeButton);
+        closeButton.click();
 
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
-
-        try {
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(By.className("modal-backdrop")));
-        } catch (Exception e) {
-
-        }
+        wait.until(ExpectedConditions.invisibilityOf(addUserModal));
     }
+
     @AfterEach
     void tearDown() {
         if (driver != null) {
