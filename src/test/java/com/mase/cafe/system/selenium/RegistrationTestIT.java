@@ -60,7 +60,6 @@ public class RegistrationTestIT {
 
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
-        // Unique username
         String username = "testuser" + System.currentTimeMillis();
         addUserModal.findElement(By.id("username")).sendKeys(username);
         addUserModal.findElement(By.id("password")).sendKeys("Test@1234!");
@@ -68,10 +67,8 @@ public class RegistrationTestIT {
 
         addUserModal.findElement(By.id("saveUserBtn")).click();
 
-        // Wait for modal to disappear
         wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
 
-        // Verify user appears in table
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), username));
         WebElement table = driver.findElement(By.id("userTable"));
         assertTrue(table.getText().contains(username), "User should be added successfully");

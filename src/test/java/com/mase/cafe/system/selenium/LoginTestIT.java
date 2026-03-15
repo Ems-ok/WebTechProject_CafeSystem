@@ -70,7 +70,7 @@ public class LoginTestIT {
         String alertText = alert.getText();
         assertEquals("Invalid credentials", alertText);
 
-        alert.accept(); // close popup
+        alert.accept();
 
     }
 

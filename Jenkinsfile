@@ -62,6 +62,10 @@ pipeline {
       when {
         expression { params.RUN_UI_TESTS }
       }
+      docker {
+                image 'selenium/standalone-chrome:latest'
+                args '-u root:root'
+              }
       steps {
         sh 'mvn verify'
       }
@@ -78,12 +82,19 @@ pipeline {
         expression { params.RUN_API_TESTS }
       }
       steps {
-        sh 'mvn test -Dtest=TestRunner'
+       sh 'mvn test -Dtest=KarateRunnerTestIT'
       }
       post {
         always {
           junit 'target/surefire-reports/*.xml'
           archiveArtifacts artifacts: 'target/karate-reports/**'
+          publishHTML(target: [
+            reportDir: 'target/karate-reports',
+            reportFiles: 'karate-summary.html',
+            reportName: 'Karate Test Report',
+            keepAll: true,
+            alwaysLinkToLastBuild: true
+          ])
         }
       }
     }
