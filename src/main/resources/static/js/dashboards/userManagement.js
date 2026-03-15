@@ -1,4 +1,4 @@
-export let pendingDeleteUserId = null;
+export const pendingDeleteUserId = null;
 
 export function renderUserManagement(root) {
     const modalContainer = document.getElementById('modal-container');
