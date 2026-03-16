@@ -1,17 +1,29 @@
 name: ci-cd-web-tech
+
 services:
   jenkins:
     image: jenkins/jenkins:2.551
+    # We use a custom network to allow predictable DNS resolution
     networks:
-      default:
+      cafe-net:
         aliases:
           - cafe-app
     ports:
       - "8083:8080"      # Jenkins UI
-      - "8081:8081"      #Cafe App
+      - "8081:8081"      # Cafe App (Spring Boot port)
       - "50000:50000"    # Jenkins agents
     volumes:
       - jenkins_data:/var/jenkins_home
+    restart: unless-stopped
+
+  selenium-chrome:
+    image: selenium/standalone-chrome:latest
+    shm_size: 2gb        #Prevents Chrome from crashing
+    networks:
+      - cafe-net
+    ports:
+      - "4444:4444"      # Remote WebDriver port
+      - "7900:7900"      # NoVNC Port (visit localhost:7900 to watch tests live)
     restart: unless-stopped
 
   ngrok:
@@ -20,23 +32,18 @@ services:
     command:
       - "http"
       - "--url=daily-lenient-kiwi.ngrok-free.app"
-      - "cafe-app:8080"
+      - "cafe-app:8081"
     environment:
       NGROK_AUTHTOKEN: "REPLACE_WITH_YOUR_ACTUAL_TOKEN"
+    networks:
+      - cafe-net
     depends_on:
       - jenkins
 
-  selenium-chrome:
-    image: selenium/standalone-chrome:latest
-    shm_size: 2gb        # Critical: Prevents Chrome from crashing in Docker
-    ports:
-      - "4444:4444"      # The port Jenkins will use to talk to the browser
-      - "7900:7900"      # (Optional) You can go to localhost:7900 to see the browser live!
-    restart: unless-stopped
-
-
   sonarqube:
     image: sonarqube:26.2.0.119303-community
+    networks:
+      - cafe-net
     depends_on:
       - sonarqube_db
     ports:
@@ -47,24 +54,25 @@ services:
       SONAR_JDBC_PASSWORD: sonar
     volumes:
       - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_logs:/opt/sonarqube/logs
       - sonarqube_extensions:/opt/sonarqube/extensions
-    restart: unless-stopped
 
   sonarqube_db:
     image: postgres:15
-    container_name: sonarqube_db
+    networks:
+      - cafe-net
     environment:
       POSTGRES_USER: sonar
       POSTGRES_PASSWORD: sonar
       POSTGRES_DB: sonarqube
     volumes:
-      - sonarqube_db_data:/var/lib/postgresql/data
-    restart: unless-stopped
+      - postgres_data:/var/lib/postgresql/data
+
+networks:
+  cafe-net:
+    driver: bridge
 
 volumes:
   jenkins_data:
   sonarqube_data:
-  sonarqube_logs:
   sonarqube_extensions:
-  sonarqube_db_data:
+  postgres_data:
