@@ -99,7 +99,7 @@ pipeline {
 
       steps {
         sh 'curl -I http://selenium-chrome:4444/wd/hub/status'
-        sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none'
+        sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none -Dserver.port=8081'
       }
       post {
         always {
