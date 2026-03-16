@@ -292,6 +292,7 @@
 							<includes>
 								<include>**/LoginTestIT.java</include>
 								<include>**/RegistrationTestIT.java</include>
+								<include>**/MenuTestIT.java</include>
 							</includes>
 						</configuration>
 						<executions>
