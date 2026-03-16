@@ -98,6 +98,7 @@ pipeline {
       }
 
       steps {
+        sh 'timeout 120s bash -c "until curl -s http://localhost:8080 > /dev/null; do echo Waiting for Cafe System...; sleep 5; done"'
         sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none'
       }
       post {
