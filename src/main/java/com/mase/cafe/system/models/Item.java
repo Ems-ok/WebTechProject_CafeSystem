@@ -5,8 +5,11 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import javax.net.ssl.SSLSession;
+
 @Entity
 @Table(name = "items")
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,4 +34,9 @@ public class Item {
 
     @NotBlank(message = "Category is required (e.g., Beverage, Pastry)")
     private String category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "menu_id")
+    private Menu menu;
+
 }

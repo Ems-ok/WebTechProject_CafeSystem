@@ -37,6 +37,8 @@ public class MenuService {
                     return menuRepository.save(newMenu);
                 });
 
+        newItem.setMenu(menu);
+
         boolean alreadyExists = menu.getItems().stream()
                 .anyMatch(item -> item.getName().equalsIgnoreCase(newItem.getName()));
 
@@ -51,9 +53,9 @@ public class MenuService {
         }
         menu.getItems().add(savedItem);
 
-        menuRepository.save(menu);
+        Menu savedMenu = menuRepository.save(menu);
 
-        return convertToDTO(menu);
+        return convertToDTO(savedMenu);
     }
 
     public List<MenuDTO> getAllMenus() {
@@ -114,4 +116,5 @@ public class MenuService {
 
         return convertToDTO(savedMenu);
     }
+
 }
