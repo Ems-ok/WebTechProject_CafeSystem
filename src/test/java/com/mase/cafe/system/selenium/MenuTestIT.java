@@ -53,9 +53,10 @@ class MenuTestIT {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-menus")));
-        WebElement navMenuLink = driver.findElement(By.id("nav-menus"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navMenuLink);
+        WebElement navMenus = driver.findElement(By.id("nav-menus"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navMenus);
 
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuDate")));
     }
 
@@ -101,6 +102,7 @@ class MenuTestIT {
 
     @Test
     void testMenuFormValidation() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         loginAndNavigateToMenu();
 
         WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
