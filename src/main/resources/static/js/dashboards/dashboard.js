@@ -1,6 +1,5 @@
-import {renderManagerDashboard} from "./managerDashboard.js";
-import {renderUserManagement} from "../features/userManagement.js";
-import { renderMenuManagement } from "../features/renderMenuManagement.js"
+import { renderManagerDashboard } from "./managerDashboard.js";
+import { renderUserManagement } from "./userManagement.js";
 
 export function renderDashboard(mainAppDiv) {
 
@@ -27,17 +26,13 @@ export function renderDashboard(mainAppDiv) {
                 <nav class="col-md-2 sidebar" aria-label="Main Sidebar">
                     <ul class="nav flex-column">
                         <li class="nav-item role-restricted" data-allowed="MANAGER">
-                            <a class="nav-link" href="#" id="nav-dashboard">
+                            <a class="nav-link active" href="#" id="nav-dashboard">
                                 <i class="bi bi-speedometer2 me-2"></i>
                                 Dashboard 
                             </a> 
-                            <a class="nav-link" href="#" id="nav-users">
+                            <a class="nav-link active" href="#" id="nav-users">
                                 <i class="bi bi-person-fill-gear"></i>
                                 Users
-                            </a>
-                            <a class="nav-link" href="#" id="nav-menus">
-                                <i class="bi bi-journal-text me-2"></i>
-                                Menu Management
                             </a>
                         </li>
                     </ul>
@@ -64,10 +59,6 @@ export function renderDashboard(mainAppDiv) {
     $("#nav-users").click(function (e) {
         e.preventDefault();
         renderUserManagement($("#dashboard-root")[0]);
-    });
-    $("#nav-menus").click(function (e) {
-        e.preventDefault();
-        renderMenuManagement($("#dashboard-root")[0]);
     });
 
     renderManagerDashboard($("#dashboard-root")[0]);
