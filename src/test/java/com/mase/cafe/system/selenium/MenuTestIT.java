@@ -50,7 +50,7 @@ class MenuTestIT {
 
     private void seedMenuData() {
 
-        if(menuRepository.findByMenuDate(TEST_DATE).isEmpty()) {
+        if (menuRepository.findByMenuDate(TEST_DATE).isEmpty()) {
             Menu menu = new Menu();
             menu.setMenuDate(TEST_DATE);
             menuRepository.saveAndFlush(menu);
@@ -75,16 +75,18 @@ class MenuTestIT {
 
     @Test
     void testCreateMenuItemSuccess() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         String uniqueItemName = "Latte " + System.currentTimeMillis();
 
         loginAndNavigateToMenu();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+        String browserDate = TEST_DATE.toString();
 
         WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
-        String dateForBrowser = TEST_DATE.toString();
         ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].value = '" + dateForBrowser + "';" +
-                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
+                "arguments[0].value = '" + browserDate + "';" +
+                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
+                        "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
                 dateField
         );
 
@@ -100,7 +102,6 @@ class MenuTestIT {
 
         try {
             WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
-
             wait.until(d -> !responseMsg.getText().trim().isEmpty());
 
             String actualText = responseMsg.getText();
