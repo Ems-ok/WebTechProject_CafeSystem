@@ -53,10 +53,12 @@ class MenuTestIT {
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
         driver.get(APP_URL);
         LocalDate testDate = LocalDate.parse("2026-03-15");
+
         if (menuRepository.findByMenuDate(testDate).isEmpty()) {
             Menu menu = new Menu();
             menu.setMenuDate(testDate);
             menuRepository.save(menu);
+            System.out.println("DEBUG: Created Menu for " + testDate + " to support Selenium test.");
         }
 
     }
