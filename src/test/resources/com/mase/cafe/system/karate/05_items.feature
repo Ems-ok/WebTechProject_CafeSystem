@@ -9,6 +9,7 @@ Feature: Items Management API
         * def now = java.lang.System.currentTimeMillis()
         * def testDate = java.time.LocalDate.now().plusDays(new java.util.Random().nextInt(1000) + 1).toString()
 
+
 Scenario: Prevent Adding Duplicate Item Name to the Same Menu
     * def duplicateCheckDate = '2026-08-10'
     * def uniqueItemName = 'Double Espresso ' + java.lang.System.currentTimeMillis()
