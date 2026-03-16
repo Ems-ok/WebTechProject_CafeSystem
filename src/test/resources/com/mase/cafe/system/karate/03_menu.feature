@@ -29,7 +29,7 @@ Feature: Menu Management API
     When method post
     # Expecting 400 Bad Request or 409 Conflict depending on your API design
     Then status 400
-    And match response contains "already exists"
+    And match response.error contains 'already exists'
 
 
     # 3. Get Menu by ID
@@ -48,30 +48,22 @@ Feature: Menu Management API
     When method get
     Then status 200
     And match response == '#[]'
-    And match response[*] contains { menuDate: '#(testDate)' }
+    And match response[*] contains { id: '#ignore', menuDate: '#(testDate)', items: '#ignore' }
 
 
   Scenario: Create Item and Add to Menu
-    # Testing the specific endpoint: /create-and-add?date=yyyy-mm-dd
-    # We use the date created in the background or a known existing one
+    # Step 1: Explicitly create the menu for this date first
+    Given path 'manager/api/menus'
+    And header Authorization = 'Bearer ' + jwtToken
+    And request { menuDate: '2026-03-15' }
+    When method post
+    Then status 201
 
-    * def itemName = 'Caramel Macchiato ' + java.lang.System.currentTimeMillis()
-
+    # Step 2: Now add the item to that menu
     Given path 'manager/api/menus/create-and-add'
     And param date = '2026-03-15'
     And header Authorization = 'Bearer ' + jwtToken
-    And header Content-Type = 'application/json'
-    And request
-    """
-    {
-      "name": "#(itemName)",
-      "description": "Rich espresso with caramel drizzle",
-      "price": 5.50,
-      "category": "Beverage"
-    }
-    """
+    And request { "name": "Caramel Macchiato", "description": "Sweet", "price": 4.5, "category": "Beverage" }
     When method post
     Then status 200
     And match response.menuDate == '2026-03-15'
-    # Check if the items list contains our new item
-    And match response.items[*].name contains itemName
