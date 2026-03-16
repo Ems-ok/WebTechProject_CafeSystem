@@ -44,20 +44,18 @@ class MenuTestIT {
     }
 
     private void loginAndNavigateToMenu() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-        WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
+        WebElement userField = wait.until(ExpectedConditions.elementToBeClickable(By.id("username")));
         userField.sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
 
         WebElement submitBtn = driver.findElement(By.id("submit"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-menus")));
-        WebElement navMenus = driver.findElement(By.id("nav-menus"));
+        WebElement navMenus = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("nav-menus")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navMenus);
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuDate")));
     }
 

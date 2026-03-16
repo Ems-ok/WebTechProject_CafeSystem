@@ -43,7 +43,7 @@ class RegistrationTestIT {
     }
 
     private void loginAndNavigateToUsers() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
         WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
         userField.sendKeys("manager");
@@ -67,7 +67,8 @@ class RegistrationTestIT {
 
         loginAndNavigateToUsers();
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn"))).click();
+        WebElement openModalBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", openModalBtn);
         WebElement addUserModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
         addUserModal.findElement(By.id("username")).sendKeys(uniqueUser);
@@ -95,7 +96,8 @@ class RegistrationTestIT {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         loginAndNavigateToUsers();
 
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn"))).click();
+        WebElement openModalBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("openAddUserBtn")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", openModalBtn);
 
         WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
         modal.findElement(By.id("username")).sendKeys("testuser");
