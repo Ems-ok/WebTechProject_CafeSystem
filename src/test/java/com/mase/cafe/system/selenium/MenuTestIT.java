@@ -31,10 +31,10 @@ class MenuTestIT {
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
         driver.get(APP_URL);
 
-        LocalDate testDate = LocalDate.parse("2026-03-15");
         menuRepository.deleteAll();
         menuRepository.flush();
 
+        LocalDate testDate = LocalDate.parse("2026-03-15");
         Menu menu = new Menu();
         menu.setMenuDate(testDate);
         menuRepository.saveAndFlush(menu);
@@ -57,6 +57,7 @@ class MenuTestIT {
         loginAndNavigateToMenu();
 
         WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
+
         ((JavascriptExecutor) driver).executeScript(
                 "arguments[0].value = '2026-03-15';" +
                         "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
@@ -67,15 +68,15 @@ class MenuTestIT {
         driver.findElement(By.id("itemDescription")).sendKeys("Automated Test");
         driver.findElement(By.id("itemPrice")).sendKeys("4.50");
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.cssSelector("button[type='submit']")));
+        WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
-        boolean isSuccess = wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menu-response-msg"), "successfully"));
+        wait.until(d -> !d.findElement(By.id("menu-response-msg")).getText().trim().isEmpty());
 
-        if (!isSuccess) {
-            String actualText = driver.findElement(By.id("menu-response-msg")).getText();
-            fail("Expected success message but found: " + actualText);
-        }
-        assertTrue(isSuccess, "Menu item was not saved successfully.");
+        String resultText = driver.findElement(By.id("menu-response-msg")).getText();
+
+        assertTrue(resultText.toLowerCase().contains("successfully"),
+                "Expected success message but received: " + resultText);
     }
 
     @Test

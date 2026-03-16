@@ -64,7 +64,7 @@ export function renderMenuManagement(container) {
         const itemBody = {
             name: document.getElementById('itemName').value,
             description: document.getElementById('itemDescription').value,
-            price: Number.parseFloat(document.getElementById('itemPrice').value),
+            price: parseFloat(document.getElementById('itemPrice').value),
             category: document.getElementById('itemCategory').value
         };
 

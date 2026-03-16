@@ -30,7 +30,7 @@ public class MenuController {
 
     @PostMapping("/create-and-add")
     public ResponseEntity<MenuDTO> createAndAdd(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
             @Valid @RequestBody ItemDTO itemDto) {
 
         Item item = new Item();

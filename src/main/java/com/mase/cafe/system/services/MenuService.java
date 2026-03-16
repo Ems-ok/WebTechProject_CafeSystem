@@ -65,7 +65,7 @@ public class MenuService {
     }
 
     private MenuDTO convertToDTO(Menu menu) {
-        if (menu == null) return null; // Safety first
+        if (menu == null) return null;
 
         MenuDTO dto = new MenuDTO();
         dto.setId(menu.getId());

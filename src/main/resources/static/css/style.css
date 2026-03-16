@@ -42,15 +42,6 @@ body.cafe-theme {
     z-index: 1000 !important;
 }
 
-.main-content {
-    margin-left: 280px !important;
-    margin-top: 20px;
-    margin-right: 20px;
-    padding: 30px;
-    background: rgba(255, 255, 255, 0.6) !important;
-    border-radius: 15px;
-}
-
 .login-page-wrapper {
     position: fixed;
     top: 0;
@@ -60,21 +51,36 @@ body.cafe-theme {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+    z-index: 9999 !important;
     background: linear-gradient(180deg, var(--cafe-cream), var(--cafe-latte));
 }
 
 .login-container {
-    width: 100% !important;
+    width: 90% !important;
     max-width: 400px !important;
     background: white !important;
     padding: 40px;
     border-radius: 20px;
     box-shadow: 0 15px 35px rgba(43, 29, 20, 0.15);
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px;
 }
 
 .cafe-input-group {
     display: flex !important;
     width: 100%;
+    min-height: 45px;
+}
+
+.main-content {
+    margin-left: 280px !important;
+    margin-top: 20px;
+    margin-right: 20px;
+    padding: 30px;
+    flex-grow: 1;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 15px;
 }
 
 .cafe-input-group .input-group-text {
