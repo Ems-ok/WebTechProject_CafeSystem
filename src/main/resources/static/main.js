@@ -1,5 +1,5 @@
-import { renderLoginPage } from "./dashboards/login.js";
-import { renderDashboard } from "./dashboards/dashboard.js";
+import { renderLoginPage } from "./js/dashboards/login.js";
+import { renderDashboard } from "./js/dashboards/dashboard.js";
 
 $(document).ready(function () {
 
