@@ -4,42 +4,86 @@ Feature: Items Management API
         * url baseUrl
         * def loginResult = call read('classpath:com/mase/cafe/system/karate/03_login_success.feature')
         * def jwtToken = loginResult.token
+        * def testDate = '2026-03-15'
 
-    # Generate a unique date based on current time to avoid collisions in the pipeline
-        * def now = java.lang.System.currentTimeMillis()
-        * def testDate = java.time.LocalDate.now().plusDays(new java.util.Random().nextInt(1000) + 1).toString()
+    Scenario: Update Menu Item - Successful
+        * def initialName = 'Original Latte ' + java.lang.System.currentTimeMillis()
+        Given path 'manager/api/menus/create-and-add'
+        And param date = testDate
+        And header Authorization = 'Bearer ' + jwtToken
+        And request { name: '#(initialName)', description: 'Old desc', price: 4.00, category: 'Beverage' }
+        When method post
+        Then status 200
 
+        * def createdItem = response.items.find(x => x.name == initialName)
+        * def itemId = createdItem.id
 
-Scenario: Prevent Adding Duplicate Item Name to the Same Menu
-    * def duplicateCheckDate = '2026-08-10'
-    * def uniqueItemName = 'Double Espresso ' + java.lang.System.currentTimeMillis()
-    * def itemPayload =
-    """
-    {
-      "name": "#(uniqueItemName)",
-      "description": "Strong and bold",
-      "price": 3.50,
-      "category": "Beverage"
-    }
-    """
+        Given path 'manager/api/items', itemId
+        And header Authorization = 'Bearer ' + jwtToken
+        And request
+        """
+        {
+          "name": "Updated Latte",
+          "description": "Silkier foam",
+          "price": 4.50,
+          "category": "Beverage"
+        }
+        """
+        When method put
+        Then status 200
+        And match response.name == 'Updated Latte'
+        And match response.price == 4.50
 
-    # 1. First Add: Should succeed and auto-create the menu
-    Given path 'manager/api/menus/create-and-add'
-    And param date = duplicateCheckDate
-    And header Authorization = 'Bearer ' + jwtToken
-    And request itemPayload
-    When method post
-    Then status 200
-    And match response.items[*].name contains uniqueItemName
+        Given path 'manager/api/menus/date'
+        And param date = testDate
+        And header Authorization = 'Bearer ' + jwtToken
+        When method get
+        Then status 200
+        And match response.items[*].name contains 'Updated Latte'
 
-    # 2. Second Add: Should fail because the name already exists for this date
-    # Even if we change the price or description, the name collision triggers the 400
-    Given path 'manager/api/menus/create-and-add'
-    And param date = duplicateCheckDate
-    And header Authorization = 'Bearer ' + jwtToken
-    # We use the same payload name
-    And request itemPayload
-    When method post
-    Then status 400
-    # Match the specific error message from your Service/GlobalExceptionHandler
-    And match response.error contains "already on the menu"
+    Scenario: Update Menu Item - Unsuccessful (Invalid Data)
+
+        * def failItemName = 'Fail Item ' + java.lang.System.currentTimeMillis()
+        Given path 'manager/api/menus/create-and-add'
+        And param date = testDate
+        And header Authorization = 'Bearer ' + jwtToken
+        And request { name: '#(failItemName)', description: 'Test', price: 1.00, category: 'Beverage' }
+        When method post
+        Then status 200
+        * def failItemId = response.items.find(x => x.name == failItemName).id
+
+        Given path 'manager/api/items', failItemId
+        And header Authorization = 'Bearer ' + jwtToken
+        And request
+        """
+        {
+          "name": "",
+          "description": "Invalid update",
+          "price": -1.00,
+          "category": "Beverage"
+        }
+        """
+        When method put
+
+        Then status 400
+        And match response.error == "#notnull"
+
+    Scenario: Prevent Adding Duplicate Item Name to the Same Menu
+        * def duplicateCheckDate = '2026-08-10'
+        * def uniqueItemName = 'Double Espresso ' + java.lang.System.currentTimeMillis()
+        * def itemPayload = { "name": "#(uniqueItemName)", "description": "Strong", "price": 3.50, "category": "Beverage" }
+
+        Given path 'manager/api/menus/create-and-add'
+        And param date = duplicateCheckDate
+        And header Authorization = 'Bearer ' + jwtToken
+        And request itemPayload
+        When method post
+        Then status 200
+
+        Given path 'manager/api/menus/create-and-add'
+        And param date = duplicateCheckDate
+        And header Authorization = 'Bearer ' + jwtToken
+        And request itemPayload
+        When method post
+        Then status 400
+        And match response.error contains "already on the menu"

@@ -116,5 +116,9 @@ public class MenuService {
 
         return convertToDTO(savedMenu);
     }
-
+    public MenuDTO getMenuByDate(LocalDate date) {
+        return menuRepository.findByMenuDate(date)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new ResourceNotFoundException("No menu found for date: " + date));
+    }
 }
