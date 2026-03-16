@@ -15,7 +15,7 @@ services:
     command:
       - "http"
       - "--url=daily-lenient-kiwi.ngrok-free.app"
-      - "jenkins:8080"
+      - "jenkins:8081"
     environment:
       NGROK_AUTHTOKEN: "REPLACE_WITH_YOUR_ACTUAL_TOKEN"
     depends_on:
