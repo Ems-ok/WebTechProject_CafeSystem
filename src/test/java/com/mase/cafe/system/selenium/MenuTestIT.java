@@ -1,4 +1,5 @@
 package com.mase.cafe.system.selenium;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -9,19 +10,17 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MenuTestIT {
 
     WebDriver driver;
-    WebDriverWait wait;
-
     private static final String APP_URL = "http://host.docker.internal:8080";
 
     @BeforeEach
@@ -43,17 +42,29 @@ class MenuTestIT {
         driver.get(APP_URL);
     }
 
-    private void navigateToMenuManagement() {
-        WebElement navMenuLink = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
-        navMenuLink.click();
+    private void loginAndNavigateToMenu() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+        WebElement userField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
+        userField.sendKeys("manager");
+        driver.findElement(By.id("password")).sendKeys("manager");
+
+        WebElement submitBtn = driver.findElement(By.id("submit"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("nav-menus")));
+        WebElement navMenuLink = driver.findElement(By.id("nav-menus"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navMenuLink);
+
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuDate")));
     }
 
     @Test
     void testCreateMenuItemSuccess() {
-        navigateToMenuManagement();
-
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         String uniqueItemName = "Latte " + System.currentTimeMillis();
+
+        loginAndNavigateToMenu();
 
         WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
         ((JavascriptExecutor) driver).executeScript(
@@ -75,26 +86,23 @@ class MenuTestIT {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
         try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
+            WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
+            String actualText = responseMsg.getText();
+            assertTrue(actualText.toLowerCase().contains("successfully"),
+                    "Expected a success message but received: " + actualText);
         } catch (TimeoutException e) {
-
             String validationError = (String) ((JavascriptExecutor) driver).executeScript(
                     "return Array.from(document.querySelectorAll(':invalid')).map(el => (el.id || el.name) + ': ' + el.validationMessage).join(' | ');"
             );
             System.err.println("DEBUG: HTML5 Validation Errors: " + validationError);
             throw e;
         }
-
-        WebElement responseMsg = driver.findElement(By.id("menu-response-msg"));
-        String actualText = responseMsg.getText();
-
-        assertTrue(actualText.toLowerCase().contains("successfully"),
-                "Expected a success message but received: " + actualText);
     }
 
     @Test
     void testMenuFormValidation() {
-        navigateToMenuManagement();
+        loginAndNavigateToMenu();
+
         WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 

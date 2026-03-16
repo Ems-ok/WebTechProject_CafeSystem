@@ -2,7 +2,6 @@ package com.mase.cafe.system.services;
 
 import com.mase.cafe.system.dtos.ItemDTO;
 import com.mase.cafe.system.dtos.MenuDTO;
-import com.mase.cafe.system.exceptions.ResourceNotFoundException;
 import com.mase.cafe.system.models.Item;
 import com.mase.cafe.system.models.Menu;
 import com.mase.cafe.system.repositories.ItemRepository;
@@ -17,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,14 +28,14 @@ public class MenuService {
     public MenuDTO createItemAndAddToMenu(LocalDate date, Item newItem) {
 
         Menu menu = menuRepository.findByMenuDate(date)
-                .orElseThrow(() -> new ResourceNotFoundException("Menu not found for date: " + date));
+                .orElseGet(() -> {
+                    Menu newMenu = new Menu();
+                    newMenu.setMenuDate(date);
+                    newMenu.setItems(new HashSet<>());
+                    return menuRepository.save(newMenu);
+                });
 
         Item savedItem = itemRepository.save(newItem);
-
-        if (menu.getItems() == null) {
-            menu.setItems(new HashSet<>());
-        }
-
         menu.getItems().add(savedItem);
         menuRepository.save(menu);
 
@@ -65,41 +63,24 @@ public class MenuService {
     }
 
     private MenuDTO convertToDTO(Menu menu) {
-        if (menu == null) return null; // Safety first
-
         MenuDTO dto = new MenuDTO();
         dto.setId(menu.getId());
         dto.setMenuDate(menu.getMenuDate());
 
-        Set<Item> items = menu.getItems() != null ? menu.getItems() : new HashSet<>();
+        Set<ItemDTO> itemDtos = new HashSet<>();
 
-        Set<ItemDTO> itemDtos = items.stream().map(item -> {
+        for (Item item : menu.getItems()) {
             ItemDTO itemDto = new ItemDTO();
             itemDto.setId(item.getId());
             itemDto.setName(item.getName());
             itemDto.setDescription(item.getDescription());
             itemDto.setPrice(item.getPrice());
             itemDto.setCategory(item.getCategory());
-            return itemDto;
-        }).collect(Collectors.toSet());
+
+            itemDtos.add(itemDto);
+        }
 
         dto.setItems(itemDtos);
         return dto;
-    }
-
-    public MenuDTO createMenu(LocalDate menuDate) {
-
-        if (menuRepository.findByMenuDate(menuDate).isPresent()) {
-
-            throw new IllegalArgumentException("A menu for this date already exists: " + menuDate);
-        }
-
-        Menu menu = new Menu();
-        menu.setMenuDate(menuDate);
-        menu.setItems(new HashSet<>());
-
-        Menu savedMenu = menuRepository.save(menu);
-
-        return convertToDTO(savedMenu);
     }
 }

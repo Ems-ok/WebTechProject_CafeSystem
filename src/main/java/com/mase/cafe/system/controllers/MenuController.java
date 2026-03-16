@@ -22,12 +22,6 @@ public class MenuController {
 
     private final MenuService menuService;
 
-    @PostMapping
-    public ResponseEntity<MenuDTO> createMenu(@RequestBody MenuDTO menuDto) {
-        MenuDTO savedMenu = menuService.createMenu(menuDto.getMenuDate());
-        return ResponseEntity.status(201).body(savedMenu);
-    }
-
     @PostMapping("/create-and-add")
     public ResponseEntity<MenuDTO> createAndAdd(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
