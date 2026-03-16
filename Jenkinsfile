@@ -107,11 +107,12 @@ pipeline {
     }
 
     stage('SonarQube Analysis') {
-      steps {
-        withSonarQubeEnv('LocalSonar') { sh 'mvn sonar:sonar -Dsonar.projectKey=Cafe-System' }
-      }
-    }
-
+       steps {
+         withSonarQubeEnv('LocalSonar') {
+           sh 'mvn sonar:sonar -Dsonar.projectKey=Cafe-System'
+         }
+       }
+     }
     stage('Quality Gate') {
       steps { timeout(time: 2, unit: 'MINUTES') { waitForQualityGate abortPipeline: true } }
     }
