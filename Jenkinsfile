@@ -98,11 +98,7 @@ pipeline {
       }
 
       steps {
-      sh '''
-                echo "Waiting for Cafe System UI to be ready..."
-                timeout 120s bash -c 'until curl -s http://localhost:8080 | grep -q "username"; do echo "UI not ready yet..."; sleep 5; done'
-                echo "Cafe System UI is UP!"
-            '''
+        sh 'curl -I http://selenium-chrome:4444/wd/hub/status'
         sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none'
       }
       post {
