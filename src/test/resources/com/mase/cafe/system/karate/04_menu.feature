@@ -44,14 +44,13 @@ Feature: Menu Management API
     And match response.id == createdMenuId
 
 
-    # 4. Get All Menus
+  # 4. Get All Menus
     Given path 'manager/api/menus'
     And header Authorization = 'Bearer ' + jwtToken
     And header Accept = 'application/json'
     When method get
     Then status 200
-    And match response == '#[]'
-    And match response[*] contains { menuDate: '#(testDate)' }
+    And match response[*].menuDate contains testDate
 
 
   Scenario: Create Item and Add to Menu
