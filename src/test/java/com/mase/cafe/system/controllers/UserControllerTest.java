@@ -30,6 +30,7 @@ class UserControllerTest {
         authentication = mock(Authentication.class);
         userController = new UserController(userService);
 
+        // Mock JWT-like authentication
         when(authentication.getName()).thenReturn("manager");
 
         Collection<GrantedAuthority> authorities = List.of(

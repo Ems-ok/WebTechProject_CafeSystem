@@ -1,6 +1,5 @@
 import { renderManagerDashboard } from './dashboards/managerDashboard.js';
-import { renderUserManagement } from './js/dashboards/userManagement.js';
-import {renderMenuManagement} from "./features/renderMenuManagement";
+import { renderUserManagement } from './dashboards/userManagement.js';
 
 let currentUser = null;
 
@@ -66,26 +65,20 @@ function setupNavigation() {
 
         renderManagerDashboard();
         renderUserManagement();
-        renderMenuManagement();
 
     });
 
 }
 
 function navigateTo(navId) {
+
     $('.sidebar .nav-link').removeClass('active');
+
     $('#' + navId).addClass('active');
 
-    const dashboardRoot = $("#dashboard-root")[0];
-
     if (navId === 'nav-dashboard') {
-        renderManagerDashboard(dashboardRoot);
+        renderManagerDashboard();
+        renderUserManagement();
     }
-    else if (navId === 'nav-users') {
-        renderUserManagement(dashboardRoot);
-    }
-    else if (navId === 'nav-menus') {
 
-        renderMenuManagement(dashboardRoot);
-    }
 }
