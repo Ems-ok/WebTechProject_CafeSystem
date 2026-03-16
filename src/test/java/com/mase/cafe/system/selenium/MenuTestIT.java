@@ -1,85 +1,79 @@
 package com.mase.cafe.system.selenium;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import com.mase.cafe.system.models.Menu;
+import com.mase.cafe.system.repositories.MenuRepository;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
+import org.openqa.selenium.support.ui.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.util.Map;
+import java.time.LocalDate;
+import static org.junit.jupiter.api.Assertions.*;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ExtendWith(SpringExtension.class)
 class MenuTestIT {
-
     WebDriver driver;
     private static final String APP_URL = "http://cafe-app:8081";
+    @Autowired private MenuRepository menuRepository;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new");
-        options.addArguments("--window-size=1920,1080");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--no-sandbox");
-        options.addArguments("--disable-dev-shm-usage");
-
-        options.setExperimentalOption("prefs", Map.of(
-                "credentials_enable_service", false,
-                "profile.password_manager_enabled", false
-        ));
-
+        options.addArguments("--headless=new", "--window-size=1920,1080", "--no-sandbox", "--disable-dev-shm-usage");
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
+        driver.get(APP_URL);
+
+        LocalDate testDate = LocalDate.parse("2026-03-15");
+        if (menuRepository.findByMenuDate(testDate).isEmpty()) {
+            Menu menu = new Menu(); menu.setMenuDate(testDate); menuRepository.save(menu);
+        }
     }
 
     private void loginAndNavigateToMenu() {
-        driver.get(APP_URL + "/login");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-
-        WebElement userField = wait.until(ExpectedConditions.elementToBeClickable(By.id("username")));
-        userField.sendKeys("manager");
+        wait.until(ExpectedConditions.elementToBeClickable(By.id("username"))).sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
-
-        driver.findElement(By.id("submit")).click();
-
-        WebElement navMenus = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.id("submit")));
+        WebElement navMenus = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("nav-menus")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navMenus);
-
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuDate")));
     }
 
     @Test
     void testCreateMenuItemSuccess() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        String uniqueItemName = "Latte " + System.currentTimeMillis();
-
         loginAndNavigateToMenu();
-
         WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].value = '2026-03-15';", dateField);
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].value = '2026-03-15';" +
+                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
+                        "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", dateField);
 
-        WebElement categoryDropdown = driver.findElement(By.id("itemCategory"));
-        new Select(categoryDropdown).selectByValue("Beverage");
-
-        driver.findElement(By.id("itemName")).sendKeys(uniqueItemName);
-        driver.findElement(By.id("itemDescription")).sendKeys("Testing E2E");
+        new Select(driver.findElement(By.id("itemCategory"))).selectByValue("Beverage");
+        driver.findElement(By.id("itemName")).sendKeys("Latte " + System.currentTimeMillis());
+        driver.findElement(By.id("itemDescription")).sendKeys("Docker test");
         driver.findElement(By.id("itemPrice")).sendKeys("4.50");
-
-        driver.findElement(By.cssSelector("button[type='submit']")).click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.cssSelector("button[type='submit']")));
 
         WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
         assertTrue(responseMsg.getText().toLowerCase().contains("successfully"));
     }
 
-    @AfterEach
-    void tearDown() {
-        if (driver != null) driver.quit();
+    @Test
+    void testMenuFormValidation() {
+        loginAndNavigateToMenu();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.cssSelector("button[type='submit']")));
+        assertFalse(driver.findElement(By.id("menuDate")).getAttribute("validationMessage").isEmpty());
     }
+
+    @AfterEach
+    void tearDown() { if (driver != null) driver.quit(); }
 }

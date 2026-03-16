@@ -3,27 +3,26 @@ name: ci-cd-web-tech
 services:
   jenkins:
     image: jenkins/jenkins:2.551
-    # We use a custom network to allow predictable DNS resolution
     networks:
       cafe-net:
         aliases:
           - cafe-app
     ports:
-      - "8083:8080"      # Jenkins UI
-      - "8081:8081"      # Cafe App (Spring Boot port)
-      - "50000:50000"    # Jenkins agents
+      - "8083:8080"
+      - "8081:8081"
+      - "50000:50000"
     volumes:
       - jenkins_data:/var/jenkins_home
     restart: unless-stopped
 
   selenium-chrome:
     image: selenium/standalone-chrome:latest
-    shm_size: 2gb        #Prevents Chrome from crashing
+    shm_size: 2gb
     networks:
       - cafe-net
     ports:
-      - "4444:4444"      # Remote WebDriver port
-      - "7900:7900"      # NoVNC Port (visit localhost:7900 to watch tests live)
+      - "4444:4444"
+      - "7900:7900"
     restart: unless-stopped
 
   ngrok:
@@ -34,38 +33,11 @@ services:
       - "--url=daily-lenient-kiwi.ngrok-free.app"
       - "cafe-app:8081"
     environment:
-      NGROK_AUTHTOKEN: "REPLACE_WITH_YOUR_ACTUAL_TOKEN"
+      NGROK_AUTHTOKEN: "YOUR_TOKEN"
     networks:
       - cafe-net
     depends_on:
       - jenkins
-
-  sonarqube:
-    image: sonarqube:26.2.0.119303-community
-    networks:
-      - cafe-net
-    depends_on:
-      - sonarqube_db
-    ports:
-      - "9000:9000"
-    environment:
-      SONAR_JDBC_URL: jdbc:postgresql://sonarqube_db:5432/sonarqube
-      SONAR_JDBC_USERNAME: sonar
-      SONAR_JDBC_PASSWORD: sonar
-    volumes:
-      - sonarqube_data:/opt/sonarqube/data
-      - sonarqube_extensions:/opt/sonarqube/extensions
-
-  sonarqube_db:
-    image: postgres:15
-    networks:
-      - cafe-net
-    environment:
-      POSTGRES_USER: sonar
-      POSTGRES_PASSWORD: sonar
-      POSTGRES_DB: sonarqube
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 networks:
   cafe-net:
@@ -73,6 +45,3 @@ networks:
 
 volumes:
   jenkins_data:
-  sonarqube_data:
-  sonarqube_extensions:
-  postgres_data:
