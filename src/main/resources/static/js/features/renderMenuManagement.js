@@ -8,70 +8,140 @@ export function renderMenuManagement(container) {
                 </div>
             </div>
 
-            <div class="card menu-card shadow-lg border-0">
+            <div class="card menu-card shadow-lg border-0 mb-5">
                 <div class="card-header cafe-header py-3">
-                    <h5 class="mb-0 fw-semibold text-white"><i class="bi bi-cup-hot me-2"></i>Create Item & Add to Menu</h5>
+                    <h5 class="mb-0 fw-semibold text-white" id="form-title">
+                        <i class="bi bi-cup-hot me-2"></i>Create Item & Add to Menu
+                    </h5>
                 </div>
-                <div class="card-body p-4 p-lg-5">
+                <div class="card-body p-4">
                     <form id="menuItemForm">
-                        <div class="row g-4">
+                        <input type="hidden" id="itemId"> <div class="row g-3">
                             <div class="col-md-6">
-                                <label class="form-label custom-label">Menu Date</label>
-                                <input type="date" id="menuDate" class="form-control cafe-input" required>
+                                <label class="form-label">Menu Date</label>
+                                <input type="date" id="menuDate" class="form-control" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label custom-label">Category</label>
-                                <select id="itemCategory" class="form-select cafe-input" required>
+                                <label class="form-label">Category</label>
+                                <select id="itemCategory" class="form-select" required>
                                     <option value="Beverage">Beverage</option>
                                     <option value="Pastry">Pastry</option>
                                     <option value="Food">Food</option>
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label custom-label">Item Name</label>
-                                <input type="text" id="itemName" class="form-control cafe-input" placeholder="e.g., Caramel Latte" required>
+                                <label class="form-label">Item Name</label>
+                                <input type="text" id="itemName" class="form-control" required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label custom-label">Description</label>
-                                <textarea id="itemDescription" class="form-control cafe-input" rows="3" placeholder="Describe the item..."></textarea>
+                                <label class="form-label">Price (€)</label>
+                                <input type="number" id="itemPrice" class="form-control" step="0.01" required>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label custom-label">Price</label>
-                                <div class="input-group cafe-input-group">
-                                    <span class="input-group-text">€</span>
-                                    <input type="number" id="itemPrice" class="form-control" step="0.01" placeholder="0.00" required>
-                                </div>
-                            </div>
-                            <div class="col-12 mt-5 text-end">
-                                <button type="submit" class="btn btn-primary save-btn px-5 py-2">
-                                    <i class="bi bi-plus-circle me-2"></i> Save to Menu
-                                </button>
+                            <div class="col-12 text-end">
+                                <button type="submit" id="saveBtn" class="btn btn-primary px-4">Save to Menu</button>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-            <div id="menu-response-msg" class="mt-4"></div>
+
+            <div id="menu-response-msg"></div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     `;
 
-    const form = document.getElementById('menuItemForm');
+    const loadItems = async () => {
+        const token = localStorage.getItem("token");
+        try {
 
+            const response = await fetch('/manager/api/menus', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const menus = await response.json();
+            const tbody = document.getElementById('itemsTableBody');
+            tbody.innerHTML = '';
+
+            menus.forEach(menu => {
+                menu.items.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.name}</td>
+                        <td><span class="badge bg-info">${item.category}</span></td>
+                        <td>€${item.price.toFixed(2)}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary edit-trigger" 
+                                    id="edit-item-${item.id}" 
+                                    data-id="${item.id}"
+                                    data-name="${item.name}"
+                                    data-category="${item.category}"
+                                    data-price="${item.price}"
+                                    data-date="${menu.menuDate}">
+                                Edit
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+
+            document.querySelectorAll('.edit-trigger').forEach(btn => {
+                btn.addEventListener('click', (e) => populateForm(e.target.dataset));
+            });
+
+        } catch (err) {
+            console.error("Failed to load items", err);
+        }
+    };
+
+    const populateForm = (data) => {
+        document.getElementById('itemId').value = data.id;
+        document.getElementById('itemName').value = data.name;
+        document.getElementById('itemCategory').value = data.category;
+        document.getElementById('itemPrice').value = data.price;
+        document.getElementById('menuDate').value = data.date;
+        document.getElementById('form-title').innerText = "Update Item";
+        document.getElementById('saveBtn').innerText = "Update Item";
+    };
+
+    loadItems();
+
+    const form = document.getElementById('menuItemForm');
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
-
+        const id = document.getElementById('itemId').value;
         const date = document.getElementById('menuDate').value;
         const itemBody = {
             name: document.getElementById('itemName').value,
-            description: document.getElementById('itemDescription').value,
             price: parseFloat(document.getElementById('itemPrice').value),
             category: document.getElementById('itemCategory').value
         };
 
+        const token = localStorage.getItem("token");
+        const url = id
+            ? `/manager/api/items/${id}`
+            : `/manager/api/menus/create-and-add?date=${date}`;
+
+        const method = id ? 'PUT' : 'POST';
+
         try {
-            const token = localStorage.getItem("token");
-            const response = await fetch(`/manager/api/menus/create-and-add?date=${date}`, {
-                method: 'POST',
+            const response = await fetch(url, {
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
@@ -80,21 +150,13 @@ export function renderMenuManagement(container) {
             });
 
             if (response.ok) {
-                $("#menu-response-msg").html(`
-                    <div class="alert shadow-sm" style="background: var(--cafe-foam); color: var(--cafe-espresso); border-left: 5px solid var(--cafe-caramel); border-radius: 12px;">
-                        <i class="bi bi-check-circle-fill me-2"></i> Successfully added <b>${itemBody.name}</b> to menu for ${date}!
-                    </div>
-                `);
+                $("#menu-response-msg").html('<div class="alert alert-success">Action Successful!</div>');
                 form.reset();
-            } else {
-                throw new Error("Failed to save item.");
+                document.getElementById('itemId').value = '';
+                loadItems();
             }
         } catch (error) {
-            $("#menu-response-msg").html(`
-                <div class="alert alert-danger shadow-sm" style="border-radius: 12px;">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Error: ${error.message}
-                </div>
-            `);
+            $("#menu-response-msg").html('<div class="alert alert-danger">Error saving item</div>');
         }
     });
 }
