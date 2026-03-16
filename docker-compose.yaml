@@ -5,7 +5,7 @@ services:
     networks:
       default:
         aliases:
-          - cafe-app #testing for selenium and jenkins in the pipeline as they are on the same port
+          - cafe-app
     ports:
       - "8083:8080"      # Jenkins UI
       - "8081:8081"      #Cafe App
