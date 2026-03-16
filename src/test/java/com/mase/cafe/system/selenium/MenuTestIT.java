@@ -1,27 +1,39 @@
 package com.mase.cafe.system.selenium;
 
+import com.mase.cafe.system.models.Menu;
+import com.mase.cafe.system.repositories.MenuRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ExtendWith(SpringExtension.class)
 class MenuTestIT {
 
     WebDriver driver;
     private static final String APP_URL = "http://cafe-app:8081";
+
+    @Autowired
+    private MenuRepository menuRepository;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -57,6 +69,13 @@ class MenuTestIT {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navMenus);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuDate")));
+
+        LocalDate testDate = LocalDate.parse("2026-03-15");
+        if (menuRepository.findByMenuDate(testDate).isEmpty()) {
+            Menu menu = new Menu();
+            menu.setMenuDate(testDate);
+            menuRepository.save(menu);
+        }
     }
 
     @Test
