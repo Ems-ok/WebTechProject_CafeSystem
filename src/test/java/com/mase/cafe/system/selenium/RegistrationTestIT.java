@@ -69,7 +69,9 @@ class RegistrationTestIT {
             Alert alert = wait.until(ExpectedConditions.alertIsPresent());
             alert.accept();
         } catch (TimeoutException e) {
-            assertTrue(modal.isDisplayed());
+
+            WebElement visibleModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+            assertTrue(visibleModal.isDisplayed());
         }
     }
 

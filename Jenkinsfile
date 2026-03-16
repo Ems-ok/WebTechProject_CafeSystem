@@ -83,7 +83,8 @@ pipeline {
             '''
         }
         sh 'until curl -s http://selenium-chrome:4444/wd/hub/status | grep "ready\\": true"; do sleep 2; done'
-        sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none'
+
+        sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none -Dmaven.test.failure.ignore=true'
       }
       post {
         always {

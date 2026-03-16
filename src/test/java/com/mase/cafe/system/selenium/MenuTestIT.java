@@ -52,6 +52,7 @@ class MenuTestIT {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         loginAndNavigateToMenu();
         WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
+
         ((JavascriptExecutor) driver).executeScript(
                 "arguments[0].value = '2026-03-15';" +
                         "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
@@ -63,8 +64,8 @@ class MenuTestIT {
         driver.findElement(By.id("itemPrice")).sendKeys("4.50");
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.cssSelector("button[type='submit']")));
 
-        WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
-        assertTrue(responseMsg.getText().toLowerCase().contains("successfully"));
+        boolean isSuccess = wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menu-response-msg"), "successfully"));
+        assertTrue(isSuccess);
     }
 
     @Test
