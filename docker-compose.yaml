@@ -8,6 +8,7 @@ services:
           - cafe-app #testing for selenium and jenkins in the pipeline as they are on the same port
     ports:
       - "8083:8080"      # Jenkins UI
+      - "8081:8081"      #Cafe App
       - "50000:50000"    # Jenkins agents
     volumes:
       - jenkins_data:/var/jenkins_home
