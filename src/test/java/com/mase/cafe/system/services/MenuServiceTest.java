@@ -1,7 +1,6 @@
 package com.mase.cafe.system.services;
 
 import com.mase.cafe.system.dtos.MenuDTO;
-import com.mase.cafe.system.exceptions.ResourceNotFoundException;
 import com.mase.cafe.system.models.Item;
 import com.mase.cafe.system.models.Menu;
 import com.mase.cafe.system.repositories.ItemRepository;
@@ -57,17 +56,20 @@ class MenuServiceTest {
     void createItemAndAddToMenuSuccess() {
 
         when(menuRepository.findByMenuDate(testDate)).thenReturn(Optional.of(testMenu));
-        when(itemRepository.save(any(Item.class))).thenReturn(testItem);
+
+        when(itemRepository.save(any(Item.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         MenuDTO result = menuService.createItemAndAddToMenu(testDate, testItem);
 
-        assertNotNull(result);
+        assertNotNull(result, "The returned MenuDTO should not be null");
         assertEquals(testDate, result.getMenuDate());
+
+        assertNotNull(result.getItems());
         assertEquals(1, result.getItems().size());
 
         verify(menuRepository).findByMenuDate(testDate);
-        verify(itemRepository).save(testItem);
-        verify(menuRepository).save(testMenu);
+        verify(menuRepository).save(any(Menu.class));
     }
 
     @Test

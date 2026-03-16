@@ -8,4 +8,7 @@ import com.mase.cafe.system.models.Item;
 public interface ItemRepository extends CrudRepository<Item, Long> {
 
 
+    void flush();
+
+    Item saveAndFlush(Item item);
 }
