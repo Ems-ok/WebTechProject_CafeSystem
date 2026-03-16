@@ -2,6 +2,7 @@ package com.mase.cafe.system.services;
 
 import com.mase.cafe.system.dtos.ItemDTO;
 import com.mase.cafe.system.dtos.MenuDTO;
+import com.mase.cafe.system.exceptions.ResourceNotFoundException;
 import com.mase.cafe.system.models.Item;
 import com.mase.cafe.system.models.Menu;
 import com.mase.cafe.system.repositories.ItemRepository;
@@ -26,19 +27,17 @@ public class MenuService {
 
     @Transactional
     public MenuDTO createItemAndAddToMenu(LocalDate date, Item newItem) {
-        Item savedItem = itemRepository.save(newItem);
 
         Menu menu = menuRepository.findByMenuDate(date)
-                .orElseGet(() -> {
-                    Menu newMenu = new Menu();
-                    newMenu.setMenuDate(date);
-                    return menuRepository.save(newMenu);
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Menu not found for date: " + date));
+
+        Item savedItem = itemRepository.save(newItem);
 
         menu.getItems().add(savedItem);
-        Menu updatedMenu = menuRepository.save(menu);
 
-        return convertToDTO(updatedMenu);
+        menuRepository.save(menu);
+
+        return convertToDTO(menu);
     }
 
     public List<MenuDTO> getAllMenus() {

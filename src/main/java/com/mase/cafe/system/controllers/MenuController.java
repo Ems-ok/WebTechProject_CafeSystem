@@ -1,5 +1,6 @@
 package com.mase.cafe.system.controllers;
 
+import com.mase.cafe.system.dtos.ItemDTO;
 import com.mase.cafe.system.dtos.MenuDTO; // Import your DTO
 import com.mase.cafe.system.models.Item;
 import com.mase.cafe.system.services.MenuService;
@@ -24,11 +25,18 @@ public class MenuController {
     @PostMapping("/create-and-add")
     public ResponseEntity<MenuDTO> createAndAdd(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-            @Valid @RequestBody Item item) {
+            @Valid @RequestBody ItemDTO itemDto) {
+
+        Item item = new Item();
+        item.setName(itemDto.getName());
+        item.setDescription(itemDto.getDescription());
+        item.setPrice(itemDto.getPrice());
+        item.setCategory(itemDto.getCategory());
 
         MenuDTO updatedMenuDto = menuService.createItemAndAddToMenu(date, item);
         return ResponseEntity.ok(updatedMenuDto);
     }
+
 
     @GetMapping
     public List<MenuDTO> getAllMenus() {

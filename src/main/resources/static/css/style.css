@@ -1,5 +1,4 @@
 :root {
-
     --cafe-espresso: #2b1d14;
     --cafe-mocha: #3b2a21;
     --cafe-cocoa: #5b3a29;
@@ -7,41 +6,111 @@
     --cafe-latte: #f7efe5;
     --cafe-cream: #fff7ee;
     --cafe-foam: #f3e7d8;
-
     --browser-blue: #0d6efd;
-    --blue-glow: rgba(13, 110, 253, 0.25);
-    --blue-subtle: rgba(13, 110, 253, 0.05);
 }
 
 body.cafe-theme {
+    margin: 0 !important;
+    padding: 0 !important;
+    padding-top: 60px !important;
     min-height: 100vh;
-    background:
-            radial-gradient(1000px 700px at 90% 30%, rgba(192, 132, 87, 0.10), transparent 55%),
-            linear-gradient(180deg, var(--cafe-cream), var(--cafe-latte)) fixed;
-}
-.top-navbar {
-    margin-bottom: 0 !important;
-    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
-    border-bottom: 1px solid rgba(0,0,0,0.2);
-    padding: 10px 0;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, var(--cafe-cream), var(--cafe-latte)) fixed;
 }
 
-.top-navbar .navbar-brand,
-.top-navbar .nav-link,
-.top-navbar h1,
-.top-navbar h5 {
-    color: var(--cafe-cream) !important;
+.navbar.top-navbar {
+    height: 60px !important;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 2000 !important;
+    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
+    display: flex;
+    align-items: center;
 }
 
 .sidebar {
-    height: calc(100vh - 56px);
-    position: sticky;
-    top: 56px !important;
+    width: 260px;
+    height: calc(100vh - 60px) !important;
+    position: fixed !important;
+    top: 60px !important;
+    left: 0;
     background: var(--cafe-foam) !important;
     border-right: 1px solid rgba(43, 29, 20, 0.1) !important;
-    padding-top: 15px !important;
-    z-index: 100;
+    z-index: 1000 !important;
 }
+
+.main-content {
+    margin-left: 280px !important;
+    margin-top: 20px;
+    margin-right: 20px;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-radius: 15px;
+}
+
+.login-page-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: linear-gradient(180deg, var(--cafe-cream), var(--cafe-latte));
+}
+
+.login-container {
+    width: 100% !important;
+    max-width: 400px !important;
+    background: white !important;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(43, 29, 20, 0.15);
+}
+
+.cafe-input-group {
+    display: flex !important;
+    width: 100%;
+}
+
+.cafe-input-group .input-group-text {
+    background-color: var(--cafe-foam) !important;
+    border: 2px solid var(--cafe-foam) !important;
+    border-right: none !important;
+    border-radius: 10px 0 0 10px !important;
+    padding: 0 15px;
+    display: flex;
+    align-items: center;
+}
+
+.cafe-input-group .form-control {
+    border-radius: 0 10px 10px 0 !important;
+    border: 2px solid var(--cafe-foam) !important;
+    flex: 1;
+}
+
+.cafe-header, .modal-header {
+    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
+    border-bottom: 2px solid var(--cafe-caramel) !important;
+    color: var(--cafe-cream) !important;
+}
+
+.btn-primary, #submit, .save-btn {
+    background: linear-gradient(135deg, var(--browser-blue), #0a58ca) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px;
+    font-weight: bold;
+    padding: 12px;
+    box-shadow: 0 4px 12px var(--blue-glow);
+    transition: transform 0.1s ease;
+}
+
+.btn-primary:active { transform: scale(0.98); }
 
 .sidebar .nav-link {
     color: var(--cafe-espresso);
@@ -53,52 +122,66 @@ body.cafe-theme {
 .sidebar .nav-link.active {
     background: var(--browser-blue) !important;
     color: white !important;
-    box-shadow: 0 4px 10px var(--blue-glow);
 }
 
-.sidebar .nav-link:hover:not(.active) {
-    background: var(--blue-subtle);
-    color: var(--browser-blue);
+.cafe-header {
+    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
+    border-radius: 12px 12px 0 0 !important;
+    padding: 15px 20px !important;
 }
 
-.main-content {
-    padding: 30px;
-    min-height: calc(100vh - 56px);
+.cafe-header h5 {
+    color: var(--cafe-cream) !important;
+    margin-bottom: 0 !important;
+    font-weight: 600;
 }
 
-body.cafe-theme .main-content {
-    background: rgba(255, 255, 255, 0.6) !important;
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-    margin-left: 0 !important;
-    border-left: 1px solid rgba(43, 29, 20, 0.05);
+.cafe-header i {
+    color: var(--cafe-cream) !important;
 }
 
-.btn-primary, #saveUserBtn {
-    background: linear-gradient(135deg, var(--browser-blue), #0a58ca) !important;
-    border: none !important;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px var(--blue-glow);
-}
-
-.form-control:focus, .form-select:focus {
-    border-color: var(--browser-blue) !important;
-    box-shadow: 0 0 0 0.25rem var(--blue-glow) !important;
-    outline: 0 !important;
-}
-
-.card {
+#userTable {
+    background: linear-gradient(135deg, var(--cafe-cocoa), var(--cafe-caramel));
+    color: #fff;
+    border: none;
     border-radius: 12px;
-    border: 1px solid rgba(43, 29, 20, 0.08);
-    overflow: hidden;
+    padding: 4px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    transform: translateY(-1px);
 }
 
-#userTable.dataTable tbody tr:hover td {
-    background-color: var(--blue-subtle) !important;
-    color: var(--browser-blue) !important;
+.dataTables_wrapper .dataTable {
+    margin-top: 25px !important;
 }
 
-::selection {
-    background-color: var(--browser-blue);
-    color: white;
+.dataTables_filter {
+    margin-bottom: 20px !important;
+}
+
+.menu-card .card-header,
+.cafe-header {
+    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
+    border-bottom: 2px solid var(--cafe-caramel) !important;
+    color: var(--cafe-cream) !important;
+    padding: 1rem 1.5rem !important;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
+    border-bottom: 2px solid var(--cafe-caramel) !important;
+    border-radius: 2px 2px 0 0 !important;
+}
+
+.modal-title, .modal-header .btn-close {
+    color: var(--cafe-cream) !important;
+    filter: brightness(0) invert(1);
+}
+
+.cafe-header h5,
+.cafe-header i,
+.modal-title {
+    color: var(--cafe-cream) !important;
+    margin-bottom: 0 !important;
 }

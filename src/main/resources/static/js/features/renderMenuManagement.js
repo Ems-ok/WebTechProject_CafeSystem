@@ -1,49 +1,49 @@
 export function renderMenuManagement(container) {
     container.innerHTML = `
-        <div class="container-fluid animate__animated animate__fadeIn">
+      <div class="container-fluid animate__animated animate__fadeIn">
             <div class="row mb-4">
                 <div class="col">
-                    <h2 class="fw-bold" style="color: var(--cafe-espresso);">Menu Management</h2>
-                    <p style="color: var(--cafe-mocha);">Create new items and assign them to your daily schedule.</p>
+                    <h2 class="fw-bold dashboard-title">Menu Management</h2>
+                    <p class="text-muted">Create new items and assign them to your daily schedule.</p>
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-header text-white py-3" style="background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)); border-radius: 16px 16px 0 0;">
-                    <h5 class="mb-0 fw-semibold"><i class="bi bi-cup-hot me-2"></i>Create Item & Add to Menu</h5>
+            <div class="card menu-card shadow-lg border-0">
+                <div class="card-header cafe-header py-3">
+                    <h5 class="mb-0 fw-semibold text-white"><i class="bi bi-cup-hot me-2"></i>Create Item & Add to Menu</h5>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-4 p-lg-5">
                     <form id="menuItemForm">
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold" style="color: var(--cafe-espresso);">Menu Date</label>
-                                <input type="date" id="menuDate" class="form-control" style="background: var(--cafe-cream); border-radius: 10px;" required>
+                                <label class="form-label custom-label">Menu Date</label>
+                                <input type="date" id="menuDate" class="form-control cafe-input" required>
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label fw-bold" style="color: var(--cafe-espresso);">Category</label>
-                                <select id="itemCategory" class="form-select cafe-dropdown-fix" style="background: var(--cafe-cream); border-radius: 10px;" required>
+                                <label class="form-label custom-label">Category</label>
+                                <select id="itemCategory" class="form-select cafe-input" required>
                                     <option value="Beverage">Beverage</option>
                                     <option value="Pastry">Pastry</option>
                                     <option value="Food">Food</option>
                                 </select>
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-bold" style="color: var(--cafe-espresso);">Item Name</label>
-                                <input type="text" id="itemName" class="form-control" placeholder="e.g., Caramel Latte" style="background: var(--cafe-cream); border-radius: 10px;" required>
+                                <label class="form-label custom-label">Item Name</label>
+                                <input type="text" id="itemName" class="form-control cafe-input" placeholder="e.g., Caramel Latte" required>
                             </div>
                             <div class="col-12">
-                                <label class="form-label fw-bold" style="color: var(--cafe-espresso);">Description</label>
-                                <textarea id="itemDescription" class="form-control" rows="2" style="background: var(--cafe-cream); border-radius: 10px;"></textarea>
+                                <label class="form-label custom-label">Description</label>
+                                <textarea id="itemDescription" class="form-control cafe-input" rows="3" placeholder="Describe the item..."></textarea>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label fw-bold" style="color: var(--cafe-espresso);">Price</label>
-                                <div class="input-group">
-                                    <span class="input-group-text" style="background: var(--cafe-foam); border: 1px solid rgba(43,29,20,0.1);">€</span>
-                                    <input type="number" id="itemPrice" class="form-control" step="0.01" style="background: var(--cafe-cream);" required>
+                                <label class="form-label custom-label">Price</label>
+                                <div class="input-group cafe-input-group">
+                                    <span class="input-group-text">€</span>
+                                    <input type="number" id="itemPrice" class="form-control" step="0.01" placeholder="0.00" required>
                                 </div>
                             </div>
                             <div class="col-12 mt-5 text-end">
-                                <button type="submit" class="btn btn-primary px-5 py-2">
+                                <button type="submit" class="btn btn-primary save-btn px-5 py-2">
                                     <i class="bi bi-plus-circle me-2"></i> Save to Menu
                                 </button>
                             </div>
