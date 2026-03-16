@@ -66,7 +66,7 @@ class RegistrationTestIT {
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
 
         String alertText = alert.getText();
-        assertEquals("Invalid credentials", alertText);
+        assertEquals("Invalid credentials. Please try again.", alertText);
 
         alert.accept();
 

@@ -53,7 +53,7 @@ class LoginTestIT {
         driver.findElement(By.id("submit")).click();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-        assertEquals("Invalid credentials", alert.getText());
+        assertEquals("Invalid credentials. Please try again.", alert.getText());
         alert.accept();
     }
 
