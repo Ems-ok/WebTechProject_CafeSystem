@@ -1,5 +1,5 @@
 import { renderManagerDashboard } from "./managerDashboard.js";
-import { renderUserManagement } from "./userManagement.js";
+import { renderUserManagement } from "../../features/userManagement.js";
 
 export function renderDashboard(mainAppDiv) {
 
