@@ -70,16 +70,22 @@ class MenuServiceTest {
     }
 
     @Test
-    void createItemAndAddToMenuThrowsExceptionWhenMenuNotFound() {
+    void createItemAndAddToMenuAutoCreatesMenuWhenNotFound() {
 
         when(menuRepository.findByMenuDate(testDate)).thenReturn(Optional.empty());
 
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
-            menuService.createItemAndAddToMenu(testDate, testItem);
-        });
+        when(menuRepository.save(any(Menu.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertTrue(exception.getMessage().contains("Menu not found for date"));
-        verify(itemRepository, never()).save(any());
+        when(itemRepository.save(any(Item.class))).thenReturn(testItem);
+
+        MenuDTO result = menuService.createItemAndAddToMenu(testDate, testItem);
+
+        assertNotNull(result);
+        assertEquals(testDate, result.getMenuDate());
+        assertEquals(1, result.getItems().size());
+
+        verify(menuRepository, times(2)).save(any(Menu.class));
+        verify(itemRepository).save(testItem);
     }
 
     @Test
