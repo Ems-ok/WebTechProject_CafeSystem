@@ -98,10 +98,11 @@ pipeline {
       }
 
       steps {
-        sh '''
-                        echo "Polling Cafe System health..."
-                        timeout 120s bash -c 'until curl -sIf http://localhost:8080/login; do echo "App still loading..."; sleep 2; done'
-                    '''
+      sh '''
+                echo "Waiting for Cafe System UI to be ready..."
+                timeout 120s bash -c 'until curl -s http://localhost:8080 | grep -q "username"; do echo "UI not ready yet..."; sleep 5; done'
+                echo "Cafe System UI is UP!"
+            '''
         sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none'
       }
       post {
