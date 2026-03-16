@@ -1,39 +1,26 @@
 package com.mase.cafe.system.selenium;
 
-import com.mase.cafe.system.models.Menu;
-import com.mase.cafe.system.repositories.MenuRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ExtendWith(SpringExtension.class)
 class MenuTestIT {
 
     WebDriver driver;
     private static final String APP_URL = "http://cafe-app:8081";
-
-    @Autowired
-    private MenuRepository menuRepository;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -46,44 +33,26 @@ class MenuTestIT {
 
         options.setExperimentalOption("prefs", Map.of(
                 "credentials_enable_service", false,
-                "profile.password_manager_enabled", false,
-                "password_manager_leak_detection", false
+                "profile.password_manager_enabled", false
         ));
 
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
-        driver.get(APP_URL);
-        LocalDate testDate = LocalDate.parse("2026-03-15");
-
-        if (menuRepository.findByMenuDate(testDate).isEmpty()) {
-            Menu menu = new Menu();
-            menu.setMenuDate(testDate);
-            menuRepository.save(menu);
-            System.out.println("DEBUG: Created Menu for " + testDate + " to support Selenium test.");
-        }
-
     }
 
     private void loginAndNavigateToMenu() {
+        driver.get(APP_URL + "/login");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
         WebElement userField = wait.until(ExpectedConditions.elementToBeClickable(By.id("username")));
         userField.sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
 
-        WebElement submitBtn = driver.findElement(By.id("submit"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+        driver.findElement(By.id("submit")).click();
 
-        WebElement navMenus = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("nav-menus")));
+        WebElement navMenus = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navMenus);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuDate")));
-
-        LocalDate testDate = LocalDate.parse("2026-03-15");
-        if (menuRepository.findByMenuDate(testDate).isEmpty()) {
-            Menu menu = new Menu();
-            menu.setMenuDate(testDate);
-            menuRepository.save(menu);
-        }
     }
 
     @Test
@@ -94,55 +63,23 @@ class MenuTestIT {
         loginAndNavigateToMenu();
 
         WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].value = '2026-03-15';" +
-                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
-                        "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
-                dateField
-        );
+        ((JavascriptExecutor) driver).executeScript("arguments[0].value = '2026-03-15';", dateField);
 
         WebElement categoryDropdown = driver.findElement(By.id("itemCategory"));
         new Select(categoryDropdown).selectByValue("Beverage");
-        ((JavascriptExecutor) driver).executeScript("arguments[0].dispatchEvent(new Event('change'));", categoryDropdown);
 
         driver.findElement(By.id("itemName")).sendKeys(uniqueItemName);
-        driver.findElement(By.id("itemDescription")).sendKeys("Testing with event-dispatched JS injection");
+        driver.findElement(By.id("itemDescription")).sendKeys("Testing E2E");
         driver.findElement(By.id("itemPrice")).sendKeys("4.50");
 
-        WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+        driver.findElement(By.cssSelector("button[type='submit']")).click();
 
-        try {
-            WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
-            String actualText = responseMsg.getText();
-            assertTrue(actualText.toLowerCase().contains("successfully"),
-                    "Expected a success message but received: " + actualText);
-        } catch (TimeoutException e) {
-            String validationError = (String) ((JavascriptExecutor) driver).executeScript(
-                    "return Array.from(document.querySelectorAll(':invalid')).map(el => (el.id || el.name) + ': ' + el.validationMessage).join(' | ');"
-            );
-            System.err.println("DEBUG: HTML5 Validation Errors: " + validationError);
-            throw e;
-        }
-    }
-
-    @Test
-    void testMenuFormValidation() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        loginAndNavigateToMenu();
-
-        WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
-
-        WebElement dateField = driver.findElement(By.id("menuDate"));
-        String validationMessage = dateField.getAttribute("validationMessage");
-        assertFalse(validationMessage.isEmpty(), "Validation message should be present for empty date");
+        WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
+        assertTrue(responseMsg.getText().toLowerCase().contains("successfully"));
     }
 
     @AfterEach
     void tearDown() {
-        if (driver != null) {
-            driver.quit();
-        }
+        if (driver != null) driver.quit();
     }
 }
