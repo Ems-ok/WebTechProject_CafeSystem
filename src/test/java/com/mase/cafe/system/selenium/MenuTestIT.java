@@ -15,7 +15,6 @@ import java.net.URL;
 import java.time.Duration;
 import java.util.Map;
 
-import static com.oracle.truffle.js.builtins.AtomicsBuiltins.Atomics.wait;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,14 +41,6 @@ class MenuTestIT {
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
         driver.get(APP_URL);
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
-        } catch (TimeoutException e) {
-            System.out.println("DEBUG: Page Title is: " + driver.getTitle());
-            System.out.println("DEBUG: Current URL is: " + driver.getCurrentUrl());
-            throw e;
-        }
     }
 
     private void loginAndNavigateToMenu() {

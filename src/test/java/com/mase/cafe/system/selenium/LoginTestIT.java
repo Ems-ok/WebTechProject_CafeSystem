@@ -3,7 +3,10 @@ package com.mase.cafe.system.selenium;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.openqa.selenium.*;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -36,17 +39,6 @@ class LoginTestIT {
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
         driver.get(APP_URL);
 
-        driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
-        driver.get(APP_URL);
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
-        } catch (TimeoutException e) {
-            System.out.println("DEBUG: Page Title is: " + driver.getTitle());
-            System.out.println("DEBUG: Current URL is: " + driver.getCurrentUrl());
-            throw e;
-        }
     }
 
     @Test
