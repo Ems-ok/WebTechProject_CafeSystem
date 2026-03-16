@@ -31,7 +31,7 @@ class MenuTestIT {
     WebDriver driver;
 
     private static final String APP_URL = "http://cafe-app:8081";
-    private static final String TEST_DATE_STR = "2026-3-15";
+    private static final LocalDate TEST_DATE = LocalDate.of(2026, 3, 15);
 
     @Autowired
     private MenuRepository menuRepository;
@@ -49,12 +49,12 @@ class MenuTestIT {
     }
 
     private void seedMenuData() {
-        LocalDate testDate = LocalDate.parse(TEST_DATE_STR);
-        if (menuRepository.findByMenuDate(testDate).isEmpty()) {
+
+        if(menuRepository.findByMenuDate(TEST_DATE).isEmpty()) {
             Menu menu = new Menu();
-            menu.setMenuDate(testDate);
+            menu.setMenuDate(TEST_DATE);
             menuRepository.saveAndFlush(menu);
-            System.out.println("DEBUG: Seeded Menu for " + testDate);
+            System.out.println("DEBUG: Seeded Menu for " + TEST_DATE);
         }
     }
 
@@ -81,10 +81,10 @@ class MenuTestIT {
         loginAndNavigateToMenu();
 
         WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
+        String dateForBrowser = TEST_DATE.toString();
         ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].value = '" + TEST_DATE_STR + "';" +
-                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
-                        "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));",
+                "arguments[0].value = '" + dateForBrowser + "';" +
+                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));",
                 dateField
         );
 
@@ -101,7 +101,7 @@ class MenuTestIT {
         try {
             WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
 
-            wait.until(d -> !responseMsg.getText().isEmpty());
+            wait.until(d -> !responseMsg.getText().trim().isEmpty());
 
             String actualText = responseMsg.getText();
             assertTrue(actualText.toLowerCase().contains("successfully"),
