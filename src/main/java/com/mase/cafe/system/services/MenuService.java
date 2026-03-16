@@ -29,12 +29,15 @@ public class MenuService {
     public MenuDTO createItemAndAddToMenu(LocalDate date, Item newItem) {
 
         Menu menu = menuRepository.findByMenuDate(date)
-                .orElseThrow(() -> new ResourceNotFoundException("Menu not found for date: " + date));
+                .orElseGet(() -> {
+                    Menu newMenu = new Menu();
+                    newMenu.setMenuDate(date);
+                    newMenu.setItems(new HashSet<>());
+                    return menuRepository.save(newMenu);
+                });
 
         Item savedItem = itemRepository.save(newItem);
-
         menu.getItems().add(savedItem);
-
         menuRepository.save(menu);
 
         return convertToDTO(menu);
