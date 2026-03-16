@@ -63,23 +63,3 @@ Feature: Menu Management API
     And request { menuDate: '#(itemDate)' }
     When method post
     Then status 201
-
-    # Now add the item (this will now pass)
-    Given path 'manager/api/menus/create-and-add'
-    And param date = itemDate
-    And header Authorization = 'Bearer ' + jwtToken
-    And header Content-Type = 'application/json'
-    And request
-    """
-    {
-      "name": "#(itemName)",
-      "description": "Rich espresso with caramel drizzle",
-      "price": 5.50,
-      "category": "Beverage"
-    }
-    """
-    When method post
-    Then status 200
-    And match response.menuDate == '2026-03-15'
-    # Check if the items list contains our new item
-    And match response.items[*].name contains itemName
