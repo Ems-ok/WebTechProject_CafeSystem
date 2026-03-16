@@ -12,4 +12,6 @@ public interface MenuRepository extends CrudRepository<Menu, Long> {
     Optional<Menu> findByMenuDate(LocalDate menuDate);
 
     void saveAndFlush(Menu menu);
+
+    void flush();
 }

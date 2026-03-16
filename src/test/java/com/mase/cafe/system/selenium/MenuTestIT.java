@@ -33,6 +33,8 @@ class MenuTestIT {
 
         LocalDate testDate = LocalDate.parse("2026-03-15");
         menuRepository.deleteAll();
+        menuRepository.flush();
+
         Menu menu = new Menu();
         menu.setMenuDate(testDate);
         menuRepository.saveAndFlush(menu);
@@ -68,6 +70,11 @@ class MenuTestIT {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.cssSelector("button[type='submit']")));
 
         boolean isSuccess = wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menu-response-msg"), "successfully"));
+
+        if (!isSuccess) {
+            String actualText = driver.findElement(By.id("menu-response-msg")).getText();
+            fail("Expected success message but found: " + actualText);
+        }
         assertTrue(isSuccess, "Menu item was not saved successfully.");
     }
 

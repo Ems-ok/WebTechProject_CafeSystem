@@ -50,6 +50,7 @@ class RegistrationTestIT {
         modal.findElement(By.id("role")).sendKeys("MANAGER");
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", modal.findElement(By.id("saveUserBtn")));
 
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
         assertTrue(wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser)));
     }
 
@@ -68,13 +69,15 @@ class RegistrationTestIT {
         modal.findElement(By.id("role")).sendKeys("MANAGER");
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", modal.findElement(By.id("saveUserBtn")));
-
         try {
 
             Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+            assertNotNull(alert);
             alert.accept();
 
-            WebElement visibleModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+            WebElement visibleModal = wait.until(ExpectedConditions.refreshed(
+                    ExpectedConditions.visibilityOfElementLocated(By.id("userModal"))
+            ));
             assertTrue(visibleModal.isDisplayed(), "Modal should remain open after duplicate error alert is dismissed.");
         } catch (TimeoutException e) {
             assertTrue(driver.findElement(By.id("userModal")).isDisplayed(), "Modal should stay open on error.");
