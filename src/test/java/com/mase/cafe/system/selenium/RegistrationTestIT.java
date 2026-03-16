@@ -11,6 +11,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -22,68 +24,84 @@ class RegistrationTestIT {
     @BeforeEach
     void setUp() throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless=new", "--window-size=1920,1080", "--no-sandbox", "--disable-dev-shm-usage");
+        options.addArguments("--headless=new");
+        options.addArguments("--window-size=1920,1080");
+
+        options.setExperimentalOption("prefs", Map.of(
+                "credentials_enable_service", false,
+                "profile.password_manager_enabled", false,
+                "password_manager_leak_detection", false
+        ));
+
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
         driver.get(APP_URL);
     }
 
-    private void loginAndNavigateToUsers() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))).sendKeys("manager");
+    @Test
+    void testLoginSuccess() {
+
+        driver.findElement(By.id("username")).sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.id("submit")));
-        WebElement navUsers = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-users")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navUsers);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("openAddUserBtn")));
+        driver.findElement(By.id("submit")).click();
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        WebElement logout = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.xpath("/html/body/div/nav/div/div/button"))
+        );
+
+        assertNotNull(logout);
+
     }
 
     @Test
-    void testRegistrationSuccess() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        loginAndNavigateToUsers();
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.id("openAddUserBtn")));
-        WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+    void testIncorrectCredentials() {
 
-        String uniqueUser = "user" + System.currentTimeMillis();
-        modal.findElement(By.id("username")).sendKeys(uniqueUser);
-        modal.findElement(By.id("password")).sendKeys("Test@1234!");
-        modal.findElement(By.id("role")).sendKeys("MANAGER");
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", modal.findElement(By.id("saveUserBtn")));
+        driver.findElement(By.id("username")).sendKeys("test");
+        driver.findElement(By.id("password")).sendKeys("test");
+        driver.findElement(By.id("submit")).click();
 
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("userModal")));
-        assertTrue(wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("userTable"), uniqueUser)));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+
+        String alertText = alert.getText();
+        assertEquals("Invalid credentials", alertText);
+
+        alert.accept();
+
     }
 
     @Test
-    void testRegistrationDuplicateAccount() {
+    void testEmptyUsername() {
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        loginAndNavigateToUsers();
+        driver.findElement(By.id("password")).sendKeys("test");
+        driver.findElement(By.id("submit")).click();
 
-        WebElement openBtn = driver.findElement(By.id("openAddUserBtn"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", openBtn);
 
-        WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-        modal.findElement(By.id("username")).sendKeys("testuser");
-        modal.findElement(By.id("password")).sendKeys("Test@1234!");
-        modal.findElement(By.id("role")).sendKeys("MANAGER");
+        WebElement usernameField = driver.findElement(By.id("username"));
+        String validationMessage = usernameField.getAttribute("validationMessage");
+        assertTrue(validationMessage.contains("Please fill"));
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", modal.findElement(By.id("saveUserBtn")));
-        try {
+    }
 
-            Alert alert = wait.until(ExpectedConditions.alertIsPresent());
-            assertNotNull(alert);
-            alert.accept();
+    @Test
+    void testEmptyPassword() {
 
-            WebElement visibleModal = wait.until(ExpectedConditions.refreshed(
-                    ExpectedConditions.visibilityOfElementLocated(By.id("userModal"))
-            ));
-            assertTrue(visibleModal.isDisplayed(), "Modal should remain open after duplicate error alert is dismissed.");
-        } catch (TimeoutException e) {
-            assertTrue(driver.findElement(By.id("userModal")).isDisplayed(), "Modal should stay open on error.");
-        }
+        driver.findElement(By.id("username")).sendKeys("test");
+        driver.findElement(By.id("submit")).click();
+
+
+        WebElement usernameField = driver.findElement(By.id("password"));
+        String validationMessage = usernameField.getAttribute("validationMessage");
+        assertTrue(validationMessage.contains("Please fill"));
+
     }
 
     @AfterEach
-    void tearDown() { if (driver != null) driver.quit(); }
+    void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
+    }
 }
