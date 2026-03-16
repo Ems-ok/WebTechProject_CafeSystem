@@ -7,6 +7,7 @@
     --cafe-cream: #fff7ee;
     --cafe-foam: #f3e7d8;
     --browser-blue: #0d6efd;
+    --hover-blue: #e7f1ff;
 }
 
 body.cafe-theme {
@@ -18,6 +19,7 @@ body.cafe-theme {
     flex-direction: column;
     background: linear-gradient(180deg, var(--cafe-cream), var(--cafe-latte)) fixed;
 }
+
 
 .navbar.top-navbar {
     height: 60px !important;
@@ -40,38 +42,36 @@ body.cafe-theme {
     background: var(--cafe-foam) !important;
     border-right: 1px solid rgba(43, 29, 20, 0.1) !important;
     z-index: 1000 !important;
+    padding-top: 20px;
 }
 
-.login-page-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    z-index: 9999 !important;
-    background: linear-gradient(180deg, var(--cafe-cream), var(--cafe-latte));
+.sidebar .nav-link {
+    color: var(--cafe-espresso);
+    margin: 4px 12px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
-.login-container {
-    width: 90% !important;
-    max-width: 400px !important;
-    background: white !important;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(43, 29, 20, 0.15);
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 20px;
+.sidebar .nav-link:hover {
+    background-color: var(--cafe-foam) !important;
+    color: white !important;
+    transform: translateX(8px);
+    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
 }
 
-.cafe-input-group {
-    display: flex !important;
-    width: 100%;
-    min-height: 45px;
+.sidebar .nav-link:hover i {
+    color: white !important;
 }
+
+.sidebar .nav-link.active {
+    background: var(--hover-blue) !important;
+    color: white !important;
+}
+
 
 .main-content {
     margin-left: 280px !important;
@@ -83,27 +83,6 @@ body.cafe-theme {
     border-radius: 15px;
 }
 
-.cafe-input-group .input-group-text {
-    background-color: var(--cafe-foam) !important;
-    border: 2px solid var(--cafe-foam) !important;
-    border-right: none !important;
-    border-radius: 10px 0 0 10px !important;
-    padding: 0 15px;
-    display: flex;
-    align-items: center;
-}
-
-.cafe-input-group .form-control {
-    border-radius: 0 10px 10px 0 !important;
-    border: 2px solid var(--cafe-foam) !important;
-    flex: 1;
-}
-
-.cafe-header, .modal-header {
-    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
-    border-bottom: 2px solid var(--cafe-caramel) !important;
-    color: var(--cafe-cream) !important;
-}
 
 .btn-primary, #submit, .save-btn {
     background: linear-gradient(135deg, var(--browser-blue), #0a58ca) !important;
@@ -112,82 +91,28 @@ body.cafe-theme {
     border-radius: 10px;
     font-weight: bold;
     padding: 12px;
-    box-shadow: 0 4px 12px var(--browser-blue);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
     transition: transform 0.1s ease;
 }
 
 .btn-primary:active { transform: scale(0.98); }
 
-.sidebar .nav-link {
-    color: var(--cafe-espresso);
-    margin: 4px 12px;
-    border-radius: 8px;
-    transition: all 0.2s;
-}
-
-.sidebar .nav-link.active {
-    background: var(--browser-blue) !important;
-    color: white !important;
-}
-
-.cafe-header {
+.cafe-header, .modal-header, .menu-card .card-header {
     background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
-    border-radius: 12px 12px 0 0 !important;
+    border-bottom: 2px solid var(--cafe-caramel) !important;
+    color: var(--cafe-cream) !important;
     padding: 15px 20px !important;
 }
 
-.cafe-header h5 {
-    color: var(--cafe-cream) !important;
-    margin-bottom: 0 !important;
-    font-weight: 600;
-}
-
-.cafe-header i {
+.modal-title, .modal-header .btn-close {
     color: var(--cafe-cream) !important;
 }
 
 #userTable {
     background: linear-gradient(135deg, var(--cafe-cocoa), var(--cafe-caramel));
     color: #fff;
-    border: none;
     border-radius: 12px;
     padding: 4px 12px;
     font-size: 0.85rem;
     font-weight: 600;
-    transition: all 0.2s ease;
-    transform: translateY(-1px);
-}
-
-.dataTables_wrapper .dataTable {
-    margin-top: 25px !important;
-}
-
-.dataTables_filter {
-    margin-bottom: 20px !important;
-}
-
-.menu-card .card-header,
-.cafe-header {
-    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
-    border-bottom: 2px solid var(--cafe-caramel) !important;
-    color: var(--cafe-cream) !important;
-    padding: 1rem 1.5rem !important;
-}
-
-.modal-header {
-    background: linear-gradient(135deg, var(--cafe-espresso), var(--cafe-mocha)) !important;
-    border-bottom: 2px solid var(--cafe-caramel) !important;
-    border-radius: 2px 2px 0 0 !important;
-}
-
-.modal-title, .modal-header .btn-close {
-    color: var(--cafe-cream) !important;
-    filter: brightness(0) invert(1);
-}
-
-.cafe-header h5,
-.cafe-header i,
-.modal-title {
-    color: var(--cafe-cream) !important;
-    margin-bottom: 0 !important;
 }
