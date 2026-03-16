@@ -98,7 +98,7 @@ pipeline {
       }
 
       steps {
-        timeout 60s bash -c 'until curl -sf http://localhost:8080; do echo "Waiting for Cafe App..."; sleep 2; done'
+        sh 'curl -I http://selenium-chrome:4444/wd/hub/status'
         sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none'
       }
       post {
