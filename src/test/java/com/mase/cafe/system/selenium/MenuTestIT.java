@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MenuTestIT {
 
     WebDriver driver;
+
     private static final String APP_URL = "http://jenkins:8080";
 
     @BeforeEach
@@ -57,7 +58,6 @@ class MenuTestIT {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navMenus);
 
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menuDate")));
     }
 
     @Test
@@ -80,7 +80,7 @@ class MenuTestIT {
         ((JavascriptExecutor) driver).executeScript("arguments[0].dispatchEvent(new Event('change'));", categoryDropdown);
 
         driver.findElement(By.id("itemName")).sendKeys(uniqueItemName);
-        driver.findElement(By.id("itemDescription")).sendKeys("Testing with event-dispatched JS injection");
+        driver.findElement(By.id("itemDescription")).sendKeys("Automated Test Item");
         driver.findElement(By.id("itemPrice")).sendKeys("4.50");
 
         WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
@@ -88,21 +88,19 @@ class MenuTestIT {
 
         try {
             WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
-            String actualText = responseMsg.getText();
-            assertTrue(actualText.toLowerCase().contains("successfully"),
-                    "Expected a success message but received: " + actualText);
+            assertTrue(responseMsg.getText().toLowerCase().contains("successfully"));
         } catch (TimeoutException e) {
             String validationError = (String) ((JavascriptExecutor) driver).executeScript(
                     "return Array.from(document.querySelectorAll(':invalid')).map(el => (el.id || el.name) + ': ' + el.validationMessage).join(' | ');"
             );
-            System.err.println("DEBUG: HTML5 Validation Errors: " + validationError);
+            System.err.println("DEBUG: Form Validation State: " + validationError);
             throw e;
         }
     }
 
     @Test
     void testMenuFormValidation() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
         loginAndNavigateToMenu();
 
         WebElement submitBtn = driver.findElement(By.cssSelector("button[type='submit']"));
