@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class LoginTestIT {
 
     WebDriver driver;
-    private static final String APP_URL = "http://jenkins:8080";
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -37,10 +36,7 @@ class LoginTestIT {
         ));
 
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
-        driver.get(APP_URL);
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username")));
+        driver.get("http://host.docker.internal:8080");
     }
 
     @Test

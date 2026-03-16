@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class RegistrationTestIT {
 
     WebDriver driver;
-    private static final String APP_URL = "http://jenkins:8080";
+    private static final String APP_URL = "http://host.docker.internal:8080";
 
     @BeforeEach
     void setUp() throws MalformedURLException {
