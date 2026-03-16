@@ -98,6 +98,17 @@ pipeline {
       }
 
       steps {
+        sh 'nohup mvn spring-boot:run -Dspring-boot.run.arguments="--server.port=8081" > spring.log 2>&1 &'
+        echo "Waiting for Cafe App to start on port 8081..."
+                    timeout(time: 2, unit: 'MINUTES') {
+                        sh '''
+                            until curl -s http://localhost:8081 > /dev/null; do
+                              echo "App not ready... sleeping 3 seconds"
+                              sleep 3
+                            done
+                            echo "App is UP and running on 8081!"
+                        '''
+                    }
         sh 'curl -I http://selenium-chrome:4444/wd/hub/status'
         sh 'mvn verify -P e2e -DskipUnitTests=true -Dparallel=none'
       }
