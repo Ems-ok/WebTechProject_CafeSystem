@@ -34,7 +34,7 @@ function configureSidebar(userRole) {
 
         const allowedRoles = $(this).data('allowed');
 
-        if (allowedRoles?.includes(role)) {
+        if (allowedRoles && allowedRoles.includes(role)) {
             $(this).show();
         } else {
             $(this).hide();
