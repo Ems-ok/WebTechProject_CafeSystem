@@ -32,11 +32,10 @@ class MenuTestIT {
         driver.get(APP_URL);
 
         LocalDate testDate = LocalDate.parse("2026-03-15");
-        if (menuRepository.findByMenuDate(testDate).isEmpty()) {
-            Menu menu = new Menu();
-            menu.setMenuDate(testDate);
-            menuRepository.save(menu);
-        }
+        menuRepository.deleteAll();
+        Menu menu = new Menu();
+        menu.setMenuDate(testDate);
+        menuRepository.saveAndFlush(menu);
     }
 
     private void loginAndNavigateToMenu() {
@@ -51,10 +50,11 @@ class MenuTestIT {
 
     @Test
     void testCreateMenuItemSuccess() {
+
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         loginAndNavigateToMenu();
-        WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
 
+        WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
         ((JavascriptExecutor) driver).executeScript(
                 "arguments[0].value = '2026-03-15';" +
                         "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
@@ -62,13 +62,13 @@ class MenuTestIT {
 
         new Select(driver.findElement(By.id("itemCategory"))).selectByValue("Beverage");
         driver.findElement(By.id("itemName")).sendKeys("Latte " + System.currentTimeMillis());
-        driver.findElement(By.id("itemDescription")).sendKeys("Docker test");
+        driver.findElement(By.id("itemDescription")).sendKeys("Automated Test");
         driver.findElement(By.id("itemPrice")).sendKeys("4.50");
+
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.cssSelector("button[type='submit']")));
 
-        WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
-        String resultText = responseMsg.getText();
-        assertTrue(resultText.toLowerCase().contains("successfully"), "Expected success but got: " + resultText);
+        boolean isSuccess = wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menu-response-msg"), "successfully"));
+        assertTrue(isSuccess, "Menu item was not saved successfully.");
     }
 
     @Test

@@ -55,9 +55,12 @@ class RegistrationTestIT {
 
     @Test
     void testRegistrationDuplicateAccount() {
+
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         loginAndNavigateToUsers();
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.id("openAddUserBtn")));
+
+        WebElement openBtn = driver.findElement(By.id("openAddUserBtn"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", openBtn);
 
         WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
         modal.findElement(By.id("username")).sendKeys("testuser");
@@ -67,11 +70,14 @@ class RegistrationTestIT {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", modal.findElement(By.id("saveUserBtn")));
 
         try {
+
             Alert alert = wait.until(ExpectedConditions.alertIsPresent());
             alert.accept();
-            assertTrue(driver.findElement(By.id("userModal")).isDisplayed());
+
+            WebElement visibleModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
+            assertTrue(visibleModal.isDisplayed(), "Modal should remain open after duplicate error alert is dismissed.");
         } catch (TimeoutException e) {
-            assertTrue(modal.isDisplayed(), "Modal should stay open on error.");
+            assertTrue(driver.findElement(By.id("userModal")).isDisplayed(), "Modal should stay open on error.");
         }
     }
 
