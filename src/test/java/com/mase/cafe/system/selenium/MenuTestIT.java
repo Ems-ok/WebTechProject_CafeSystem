@@ -33,7 +33,9 @@ class MenuTestIT {
 
         LocalDate testDate = LocalDate.parse("2026-03-15");
         if (menuRepository.findByMenuDate(testDate).isEmpty()) {
-            Menu menu = new Menu(); menu.setMenuDate(testDate); menuRepository.save(menu);
+            Menu menu = new Menu();
+            menu.setMenuDate(testDate);
+            menuRepository.save(menu);
         }
     }
 
@@ -64,8 +66,9 @@ class MenuTestIT {
         driver.findElement(By.id("itemPrice")).sendKeys("4.50");
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.cssSelector("button[type='submit']")));
 
-        boolean isSuccess = wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menu-response-msg"), "successfully"));
-        assertTrue(isSuccess);
+        WebElement responseMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("menu-response-msg")));
+        String resultText = responseMsg.getText();
+        assertTrue(resultText.toLowerCase().contains("successfully"), "Expected success but got: " + resultText);
     }
 
     @Test

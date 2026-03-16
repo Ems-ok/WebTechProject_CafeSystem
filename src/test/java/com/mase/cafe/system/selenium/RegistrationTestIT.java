@@ -58,20 +58,20 @@ class RegistrationTestIT {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         loginAndNavigateToUsers();
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.id("openAddUserBtn")));
-        WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
 
+        WebElement modal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
         modal.findElement(By.id("username")).sendKeys("testuser");
         modal.findElement(By.id("password")).sendKeys("Test@1234!");
         modal.findElement(By.id("role")).sendKeys("MANAGER");
+
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", modal.findElement(By.id("saveUserBtn")));
 
         try {
             Alert alert = wait.until(ExpectedConditions.alertIsPresent());
             alert.accept();
+            assertTrue(driver.findElement(By.id("userModal")).isDisplayed());
         } catch (TimeoutException e) {
-
-            WebElement visibleModal = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("userModal")));
-            assertTrue(visibleModal.isDisplayed());
+            assertTrue(modal.isDisplayed(), "Modal should stay open on error.");
         }
     }
 
