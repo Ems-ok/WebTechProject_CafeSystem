@@ -110,7 +110,7 @@ class ItemTestIT {
         login();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        WebElement navItems = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-items")));
+        WebElement navItems = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navItems);
 
         WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"itemName\"]")));
