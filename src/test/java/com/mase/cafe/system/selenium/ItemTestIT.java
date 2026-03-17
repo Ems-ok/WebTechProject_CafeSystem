@@ -110,18 +110,17 @@ class ItemTestIT {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//button[contains(@id, 'editingItemId')][contains(., 'Edit')]")
-        ));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
-
         WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("editItemName")));
         nameField.clear();
 
-        WebElement updateBtn = driver.findElement(By.id("updateItemSubmit"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", updateBtn);
+        WebElement updateBtn = driver.findElement(By.id("submitBtn"));
 
-        assertFalse(nameField.getAttribute("validationMessage").isEmpty(), "Expected validation error for empty name");
+        updateBtn.click();
+
+       ((JavascriptExecutor) driver).executeScript("arguments[0].click();", updateBtn);
+
+        assertFalse(nameField.getAttribute("validationMessage").isEmpty(),
+                "The 'Required' validation should have triggered for an empty name field.");
     }
 
     @AfterEach
