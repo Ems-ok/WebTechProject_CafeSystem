@@ -112,7 +112,7 @@ class ItemTestIT {
 
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dashboard-root")));
 
-        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName")));
+        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"dashboard-root\"]/div/div[1]/div/h2")));
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", nameField);
         nameField.clear();
