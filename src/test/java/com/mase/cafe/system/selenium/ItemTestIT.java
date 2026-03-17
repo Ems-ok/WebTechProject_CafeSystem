@@ -80,22 +80,22 @@ class ItemTestIT {
         WebElement navItems = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("nav-menus")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navItems);
 
-        WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#menuCardsContainer > div > div > div.card-body.p-0 > ul > li:nth-child(1) > div.btn-group > button.btn.btn-sm.btn-outline-primary.border-0.edit-btn > i" + targetItemId)));
+        WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//*[@id=\"menuCardsContainer\"]/div/div/div[2]/ul/li[1]/div[2]/button[1]")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
 
-        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("editItemName")));
+        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName")));
         nameField.clear();
         nameField.sendKeys("Updated Caramel Latte");
 
-        WebElement priceField = driver.findElement(By.id("editItemPrice"));
+        WebElement priceField = driver.findElement(By.id("itemPrice"));
         priceField.clear();
         priceField.sendKeys("5.50");
 
-        WebElement updateBtn = driver.findElement(By.id("updateItemSubmit"));
+        WebElement updateBtn = driver.findElement(By.id("submitBtn"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", updateBtn);
 
-        wait.until(d -> !d.findElement(By.id("item-response-msg")).getText().trim().isEmpty());
-        String resultText = driver.findElement(By.id("item-response-msg")).getText();
+        wait.until(d -> !d.findElement(By.id("menu-response-msg")).getText().trim().isEmpty());
+        String resultText = driver.findElement(By.id("menu-response-msg")).getText();
 
         assertTrue(resultText.toLowerCase().contains("successfully") || resultText.toLowerCase().contains("updated"),
                 "Expected update success message but got: " + resultText);
