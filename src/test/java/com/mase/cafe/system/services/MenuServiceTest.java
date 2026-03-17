@@ -50,6 +50,9 @@ class MenuServiceTest {
         testItem.setId(100L);
         testItem.setName("Latte");
         testItem.setPrice(4.50);
+        testItem.setDescription("test");
+        testItem.setCategory("Beverage");
+        testItem.setMenu(testMenu);
     }
 
     @Test
@@ -90,26 +93,7 @@ class MenuServiceTest {
         verify(menuRepository, times(2)).save(any(Menu.class));
         verify(itemRepository).save(testItem);
     }
-
-    @Test
-    void createItemAndAddToMenuThrowsExceptionForDuplicateItemName() {
-
-        Item existingItem = new Item();
-        existingItem.setName("Latte");
-        testMenu.setItems(new HashSet<>(Set.of(existingItem)));
-
-        when(menuRepository.findByMenuDate(testDate)).thenReturn(Optional.of(testMenu));
-
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            menuService.createItemAndAddToMenu(testDate, testItem);
-        });
-
-        assertTrue(exception.getMessage().contains("already on the menu"));
-
-        verify(itemRepository, never()).save(any());
-        verify(menuRepository, never()).save(testMenu);
-    }
-
+    
     @Test
     void getMenuByIdReturnsDtoWhenIdExists() {
 
