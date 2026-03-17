@@ -37,15 +37,6 @@ public class MenuService {
                     return menuRepository.save(newMenu);
                 });
 
-        newItem.setMenu(menu);
-
-        boolean alreadyExists = menu.getItems().stream()
-                .anyMatch(item -> item.getName().equalsIgnoreCase(newItem.getName()));
-
-        if (alreadyExists) {
-            throw new IllegalArgumentException("Item '" + newItem.getName() + "' is already on the menu for " + date);
-        }
-
         Item savedItem = itemRepository.save(newItem);
 
         if (menu.getItems() == null) {
@@ -53,9 +44,9 @@ public class MenuService {
         }
         menu.getItems().add(savedItem);
 
-        Menu savedMenu = menuRepository.save(menu);
+        menuRepository.save(menu);
 
-        return convertToDTO(savedMenu);
+        return convertToDTO(menu);
     }
 
     public List<MenuDTO> getAllMenus() {
@@ -111,10 +102,12 @@ public class MenuService {
         Menu menu = new Menu();
         menu.setMenuDate(menuDate);
         menu.setItems(new HashSet<>());
+
         Menu savedMenu = menuRepository.save(menu);
 
         return convertToDTO(savedMenu);
     }
+
     public MenuDTO getMenuByDate(LocalDate date) {
         return menuRepository.findByMenuDate(date)
                 .map(this::convertToDTO)
