@@ -7,7 +7,6 @@ import lombok.*;
 
 @Entity
 @Table(name = "items")
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -32,9 +31,4 @@ public class Item {
 
     @NotBlank(message = "Category is required (e.g., Beverage, Pastry)")
     private String category;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_id")
-    private Menu menu;
-
 }

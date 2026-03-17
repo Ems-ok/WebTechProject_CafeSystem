@@ -25,6 +25,11 @@ public class Menu {
     @Column(name = "menu_date", unique = true, nullable = false)
     private LocalDate menuDate;
 
-    @OneToMany(mappedBy = "menu", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToMany
+    @JoinTable(
+            name = "menu_items_link",
+            joinColumns = @JoinColumn(name = "menu_id"),
+            inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
     private Set<Item> items = new HashSet<>();
 }

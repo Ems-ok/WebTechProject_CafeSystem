@@ -55,12 +55,4 @@ public class MenuController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
-
-    @GetMapping("/date")
-    public ResponseEntity<MenuDTO> getMenuByDate(
-            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        MenuDTO menu = menuService.getMenuByDate(date);
-        return ResponseEntity.ok(menu);
-    }
 }
