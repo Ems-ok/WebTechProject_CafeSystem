@@ -109,10 +109,12 @@ class ItemTestIT {
         login();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName")));
+        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#itemName")));
         nameField.clear();
 
-        WebElement submitBtn = driver.findElement(By.id("submitBtn"));
+        WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("submitBtn")));
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
         submitBtn.click();
 
         assertFalse(nameField.getAttribute("validationMessage").isEmpty());
