@@ -69,7 +69,7 @@ class ItemTestIT {
         wait.until(ExpectedConditions.elementToBeClickable(By.id("username"))).sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.id("submit")));
-        wait.until(ExpectedConditions.urlContains("dashboard"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"brandLink\"]")));
     }
 
     @Test
