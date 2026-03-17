@@ -110,18 +110,19 @@ class ItemTestIT {
         login();
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//*[@id=\"dashboard-root\"]/div/div[1]/div/h2")));
+        WebElement navItems = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-items")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navItems);
 
-        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName")));
+        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"itemName\"]")));
 
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", nameField);
         nameField.clear();
 
         WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("submitBtn")));
+
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
         String validationMsg = nameField.getAttribute("validationMessage");
-        assertFalse(validationMsg.isEmpty(), "HTML5 validation message should not be empty");
+        assertFalse(validationMsg.isEmpty(), "The 'Required' validation should have blocked the submission.");
     }
 
     @AfterEach

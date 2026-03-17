@@ -1,11 +1,12 @@
 export function renderMenuManagement(container) {
-    // 1. Added the missing container for the cards/table at the bottom
+
     container.innerHTML = `
       <div class="container-fluid animate__animated animate__fadeIn">
             <div class="row mb-4">
                 <div class="col">
+                <div class="col">
                     <h2 class="fw-bold dashboard-title">Menu Management</h2>
-                    <p class="text-muted">Create new items and assign them to your daily schedule.</p>
+                    <p class="text-muted">Create new items and assign them to your daily menu.</p>
                 </div>
             </div>
 
