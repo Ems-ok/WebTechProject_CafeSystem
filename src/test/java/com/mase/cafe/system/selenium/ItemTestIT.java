@@ -112,6 +112,10 @@ class ItemTestIT {
         WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#itemName")));
         nameField.clear();
 
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", nameField);
+
+        nameField.clear();
+
         WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("submitBtn")));
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
