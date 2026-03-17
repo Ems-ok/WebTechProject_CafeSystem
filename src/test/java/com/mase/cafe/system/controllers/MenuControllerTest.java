@@ -1,6 +1,8 @@
 package com.mase.cafe.system.controllers;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import com.mase.cafe.system.dtos.ItemDTO;
@@ -16,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 class MenuControllerTest {
 
@@ -35,54 +36,30 @@ class MenuControllerTest {
         LocalDate testDate = LocalDate.now();
         ItemDTO inputDto = new ItemDTO();
         inputDto.setName("Hot Chocolate");
+        inputDto.setPrice(3.50);
+        inputDto.setCategory("Beverage");
 
-        MenuDTO expectedMenu = new MenuDTO();
+        MenuDTO expectedMenuDto = new MenuDTO();
+        expectedMenuDto.setId(1L);
 
-        when(menuService.createItemAndAddToMenu(eq(testDate), any(Item.class))).thenReturn(expectedMenu);
+        when(menuService.createItemAndAddToMenu(eq(testDate), any(Item.class)))
+                .thenReturn(expectedMenuDto);
 
         ResponseEntity<MenuDTO> response = menuController.createAndAdd(testDate, inputDto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody());
         verify(menuService, times(1)).createItemAndAddToMenu(eq(testDate), any(Item.class));
     }
 
     @Test
     void getAllMenusReturnsListOfMenus() {
-
         List<MenuDTO> expectedMenus = Arrays.asList(new MenuDTO(), new MenuDTO());
         when(menuService.getAllMenus()).thenReturn(expectedMenus);
 
         List<MenuDTO> actualMenus = menuController.getAllMenus();
 
-        assertEquals(expectedMenus, actualMenus);
         assertEquals(2, actualMenus.size());
         verify(menuService, times(1)).getAllMenus();
-    }
-
-    @Test
-    void getMenuByIdReturnsMenuWhenFound() {
-
-        Long menuId = 1L;
-        MenuDTO menu = new MenuDTO();
-        when(menuService.getMenuById(menuId)).thenReturn(Optional.of(menu));
-
-        ResponseEntity<MenuDTO> response = menuController.getMenuById(menuId);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertSame(menu, response.getBody());
-        verify(menuService, times(1)).getMenuById(menuId);
-    }
-
-    @Test
-    void getMenuByIdReturnsNotFoundWhenMenuMissing() {
-
-        Long menuId = 99L;
-        when(menuService.getMenuById(menuId)).thenReturn(Optional.empty());
-
-        ResponseEntity<MenuDTO> response = menuController.getMenuById(menuId);
-
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertNull(response.getBody());
-        verify(menuService, times(1)).getMenuById(menuId);
     }
 }

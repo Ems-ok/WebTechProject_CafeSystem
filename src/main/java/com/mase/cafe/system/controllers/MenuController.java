@@ -13,7 +13,7 @@ import jakarta.validation.Valid;
 
 import java.time.LocalDate;
 import java.util.List;
-//didn't go into main
+
 @RestController
 @RequestMapping("/manager/api/menus")
 @PreAuthorize("hasRole('MANAGER')")
@@ -54,5 +54,13 @@ public class MenuController {
         return menuService.getMenuById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @GetMapping("/date")
+    public ResponseEntity<MenuDTO> getMenuByDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        MenuDTO menu = menuService.getMenuByDate(date);
+        return ResponseEntity.ok(menu);
     }
 }
