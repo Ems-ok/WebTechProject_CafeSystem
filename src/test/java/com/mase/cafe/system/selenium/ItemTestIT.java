@@ -110,7 +110,9 @@ class ItemTestIT {
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("editingItemId" + targetItemId)));
+        WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//button[contains(@id, 'editingItemId')][contains(., 'Edit')]")
+        ));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
 
         WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("editItemName")));
