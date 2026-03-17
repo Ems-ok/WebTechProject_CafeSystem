@@ -33,7 +33,7 @@ services:
       - "--url=daily-lenient-kiwi.ngrok-free.app"
       - "cafe-app:8081"
     environment:
-      NGROK_AUTHTOKEN: "2sLOPMJpEI2LXQxnSBxRgVTT3WY_5hq9cADtHuvdoM7DmcKxo"
+      NGROK_AUTHTOKEN: "GET FROM NGROK"
     networks:
       - cafe-net
     depends_on:
