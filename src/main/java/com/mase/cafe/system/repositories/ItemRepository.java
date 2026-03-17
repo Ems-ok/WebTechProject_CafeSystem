@@ -10,5 +10,4 @@ public interface ItemRepository extends CrudRepository<Item, Long> {
 
     void flush();
 
-    Item saveAndFlush(Item item);
 }
