@@ -105,22 +105,17 @@ class ItemTestIT {
     }
 
     @Test
-    void testItemUpdateValidation() {
+    void testCreateValidation() {
         login();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-
-        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("editItemName")));
+        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName")));
         nameField.clear();
 
-        WebElement updateBtn = driver.findElement(By.id("submitBtn"));
+        WebElement submitBtn = driver.findElement(By.id("submitBtn"));
+        submitBtn.click();
 
-        updateBtn.click();
-
-       ((JavascriptExecutor) driver).executeScript("arguments[0].click();", updateBtn);
-
-        assertFalse(nameField.getAttribute("validationMessage").isEmpty(),
-                "The 'Required' validation should have triggered for an empty name field.");
+        assertFalse(nameField.getAttribute("validationMessage").isEmpty());
     }
 
     @AfterEach
