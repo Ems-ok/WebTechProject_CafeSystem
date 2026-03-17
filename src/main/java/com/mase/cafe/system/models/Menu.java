@@ -12,6 +12,7 @@ import java.util.Set;
 @Table(name = "menus")
 @Getter
 @Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Menu {
