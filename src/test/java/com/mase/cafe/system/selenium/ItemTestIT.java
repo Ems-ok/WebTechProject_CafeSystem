@@ -41,8 +41,8 @@ class ItemTestIT {
         driver.get(APP_URL);
 
         itemRepository.deleteAll();
-        menuRepository.deleteAll();
         itemRepository.flush();
+        menuRepository.deleteAll();
         menuRepository.flush();
 
         Menu menu = new Menu();
@@ -69,6 +69,7 @@ class ItemTestIT {
         wait.until(ExpectedConditions.elementToBeClickable(By.id("username"))).sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.id("submit")));
+        wait.until(ExpectedConditions.urlContains("dashboard"));
     }
 
     @Test
@@ -107,21 +108,20 @@ class ItemTestIT {
     @Test
     void testCreateValidation() {
         login();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
-        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#itemName")));
-        nameField.clear();
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("dashboard-root")));
+
+        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName")));
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", nameField);
-
         nameField.clear();
 
         WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("submitBtn")));
-
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
-        submitBtn.click();
 
-        assertFalse(nameField.getAttribute("validationMessage").isEmpty());
+        String validationMsg = nameField.getAttribute("validationMessage");
+        assertFalse(validationMsg.isEmpty(), "HTML5 validation message should not be empty");
     }
 
     @AfterEach
