@@ -16,16 +16,16 @@ export function renderMenuManagement(container) {
                     </h5>
                 </div>
                 <div class="card-body p-4 p-lg-5">
-                    <form id="menuItemForm">
-                        <input type="hidden" id="editingItemId" value="">
+                   <form id="menuItemForm">
+                        <input type="hidden" id="editingItemId" name="id" value="">
                         <div class="row g-4">
                             <div class="col-md-6">
                                 <label class="form-label custom-label">Menu Date</label>
-                                <input type="date" id="menuDate" class="form-control cafe-input" required>
+                                <input type="date" id="menuDate" name="date" class="form-control cafe-input" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label custom-label">Category</label>
-                                <select id="itemCategory" class="form-select cafe-input" required>
+                                <select id="itemCategory" name="category" class="form-select cafe-input" required>
                                     <option value="Beverage">Beverage</option>
                                     <option value="Pastry">Pastry</option>
                                     <option value="Food">Food</option>
@@ -33,18 +33,18 @@ export function renderMenuManagement(container) {
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label custom-label">Item Name</label>
-                                <input type="text" id="itemName" class="form-control cafe-input" placeholder="e.g., Caramel Latte" required>
+                                <input type="text" id="itemName" name="name" class="form-control cafe-input" placeholder="e.g., Caramel Latte" required>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label class="form-label custom-label">Price</label>
                                 <div class="input-group cafe-input-group">
                                     <span class="input-group-text">€</span>
-                                    <input type="number" id="itemPrice" class="form-control" step="0.01" placeholder="0.00" required>
+                                    <input type="number" id="itemPrice" name="price" class="form-control" step="0.01" min="0" placeholder="0.00" required>
                                 </div>
                             </div>
                             <div class="col-12">
                                 <label class="form-label custom-label">Description</label>
-                                <textarea id="itemDescription" class="form-control cafe-input" rows="3" placeholder="Describe the item..."></textarea>
+                                <textarea id="itemDescription" name="description" class="form-control cafe-input" rows="3" placeholder="Describe the item..."></textarea>
                             </div>
                             <div class="col-12 mt-4 text-end">
                                 <button type="button" id="cancelEdit" class="btn btn-secondary me-2 d-none">Cancel</button>
