@@ -8,7 +8,6 @@ Feature: User Management API
 
   Scenario: Manage users (CRUD)
 
-    #Get all users
     Given path 'manager/api/users'
     And header Authorization = 'Bearer ' + jwtToken
     And header Accept = 'application/json'

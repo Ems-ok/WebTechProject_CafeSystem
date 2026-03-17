@@ -18,6 +18,5 @@ Feature: Authentication API - login success
     Then status 200
     And match response.token == '#notnull'
 
-    # Store the JWT token in a variable (do not use 'return')
     * def token = response.token
     * print 'JWT token:', token
