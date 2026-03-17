@@ -31,10 +31,9 @@ class ItemServiceTest {
 
     @Test
     void updateItem_Success() {
-        // Arrange
+
         Long itemId = 1L;
 
-        // Mock existing menu and item
         Menu mockMenu = new Menu();
         mockMenu.setId(10L);
 
