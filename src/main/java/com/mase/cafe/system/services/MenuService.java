@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.awt.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -37,13 +38,25 @@ public class MenuService {
                     return menuRepository.save(newMenu);
                 });
 
-        Item savedItem = itemRepository.save(newItem);
-
         if (menu.getItems() == null) {
             menu.setItems(new HashSet<>());
         }
-        menu.getItems().add(savedItem);
 
+        boolean isDuplicate = false;
+
+        for (Item item : menu.getItems()) {
+            if (item.getName() != null && item.getName().equalsIgnoreCase(newItem.getName())) {
+                isDuplicate = true;
+                break;
+            }
+        }
+
+        if (isDuplicate) {
+            throw new IllegalArgumentException("already on the menu");
+        }
+
+        Item savedItem = itemRepository.save(newItem);
+        menu.getItems().add(savedItem);
         menuRepository.save(menu);
 
         return convertToDTO(menu);
