@@ -109,7 +109,6 @@ public class MenuService {
         Menu menu = new Menu();
         menu.setMenuDate(menuDate);
         menu.setItems(new HashSet<>());
-
         Menu savedMenu = menuRepository.save(menu);
 
         return convertToDTO(savedMenu);

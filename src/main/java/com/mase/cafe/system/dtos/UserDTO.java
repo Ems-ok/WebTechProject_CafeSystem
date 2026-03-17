@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO implements Serializable {
-    
+
     private Long id;
     private String username;
 
