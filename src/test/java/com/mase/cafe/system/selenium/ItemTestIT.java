@@ -11,10 +11,12 @@ import org.openqa.selenium.support.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,13 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 class ItemTestIT {
 
-    WebDriver driver;
+    private WebDriver driver;
     private static final String APP_URL = "http://cafe-app:8081";
 
-    @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    private MenuRepository menuRepository;
+    @Autowired private MenuRepository menuRepository;
+    @Autowired private ItemRepository itemRepository;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
@@ -40,83 +40,82 @@ class ItemTestIT {
         menuRepository.deleteAll();
 
         driver.get(APP_URL);
-        login();
-        createItemViaUI("Original Latte", "3.50");
     }
 
-    private void createItemViaUI(String name, String price) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+    private void loginAndNavigate() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        List<WebElement> usernameFields = driver.findElements(By.id("username"));
+        if (!usernameFields.isEmpty()) {
+            usernameFields.get(0).sendKeys("manager");
+            driver.findElement(By.id("password")).sendKeys("manager");
+            driver.findElement(By.id("submit")).click();
+        }
 
         WebElement nav = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", nav);
-
-        WebElement categoryDropdown = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("itemCategory")));
-        assertNotNull(categoryDropdown);
-        new Select(categoryDropdown).selectByVisibleText("Beverage");
-
-        driver.findElement(By.id("itemName")).sendKeys(name);
-        driver.findElement(By.id("itemPrice")).sendKeys(price);
-        driver.findElement(By.id("itemDescription")).sendKeys("Freshly brewed");
-
-        WebElement dateField = driver.findElement(By.id("menuDate"));
-        String today = LocalDate.now().toString(); // YYYY-MM-DD
-        ((JavascriptExecutor) driver).executeScript(
-                "arguments[0].value = '" + today + "';" +
-                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
-                        "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", dateField);
-
-        WebElement submitBtn = driver.findElement(By.id("submitBtn"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
-
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menuCardsContainer"), name));
     }
 
     @Test
     void testUpdateItemSuccess() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        loginAndNavigate();
+
+        String itemName = "Latte-" + System.currentTimeMillis();
+        createItemViaUI(itemName, "4.50");
 
         WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(By.className("edit-btn")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
 
         WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName")));
         nameField.clear();
-        nameField.sendKeys("Updated Caramel Latte");
+        nameField.sendKeys("Updated Latte");
 
         WebElement priceField = driver.findElement(By.id("itemPrice"));
         priceField.clear();
         priceField.sendKeys("5.50");
 
-        driver.findElement(By.id("submitBtn")).click();
+        WebElement submitBtn = driver.findElement(By.id("submitBtn"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
         wait.until(d -> !d.findElement(By.id("menu-response-msg")).getText().trim().isEmpty());
-        assertTrue(driver.findElement(By.id("menu-response-msg")).getText().contains("successfully"));
-    }
-
-    private void login() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))).sendKeys("manager");
-        driver.findElement(By.id("password")).sendKeys("manager");
-        driver.findElement(By.id("submit")).click();
+        assertTrue(driver.findElement(By.id("menu-response-msg")).getText().toLowerCase().contains("successfully"));
     }
 
     @Test
     void testCreateValidation() {
-        login();
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+        loginAndNavigate();
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        WebElement navItems = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navItems);
-
-        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"itemName\"]")));
-
+        WebElement nameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName")));
         nameField.clear();
 
-        WebElement submitBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("submitBtn")));
-
+        WebElement submitBtn = driver.findElement(By.id("submitBtn"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
-        String validationMsg = nameField.getAttribute("validationMessage");
-        assertFalse(validationMsg.isEmpty(), "The 'Required' validation should have blocked the submission.");
+        assertFalse(nameField.getAttribute("validationMessage").isEmpty(), "HTML5 validation should trigger");
+    }
+
+    private void createItemViaUI(String name, String price) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        WebElement dateField = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuDate")));
+        String today = LocalDate.now().toString();
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].value = '" + today + "';" +
+                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
+                        "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", dateField);
+
+        new Select(driver.findElement(By.id("itemCategory"))).selectByVisibleText("Beverage");
+
+        driver.findElement(By.id("itemName")).sendKeys(name);
+        driver.findElement(By.id("itemPrice")).sendKeys(price);
+        driver.findElement(By.id("itemDescription")).sendKeys("Test Desc");
+
+        WebElement submitBtn = driver.findElement(By.id("submitBtn"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menuCardsContainer"), name));
     }
 
     @AfterEach
