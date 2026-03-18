@@ -1,7 +1,7 @@
 package com.mase.cafe.system.controllers;
 
 import com.mase.cafe.system.dtos.ItemDTO;
-import com.mase.cafe.system.dtos.MenuDTO; // Import your DTO
+import com.mase.cafe.system.dtos.MenuDTO;
 import com.mase.cafe.system.models.Item;
 import com.mase.cafe.system.services.MenuService;
 import lombok.RequiredArgsConstructor;

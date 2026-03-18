@@ -30,7 +30,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void updateItem_Success() {
+    void updateItemSuccess() {
 
         Long itemId = 1L;
 
@@ -65,7 +65,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void updateItem_NotFound_ThrowsException() {
+    void updateItemNotFoundThrowsException() {
 
         Long itemId = 99L;
         ItemDTO updateDetails = new ItemDTO();
