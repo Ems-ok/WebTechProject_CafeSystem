@@ -4,7 +4,9 @@ spring:
     driverClassName: org.h2.Driver
     username: sa
     password:
-
     jwt:
       secret=QN4HTijhnwrmBIFiE/x76umO3AgPZ5w3M1c4ophax5E=
       jwt.expiration=3600000
+
+  server:
+    port: 8081
