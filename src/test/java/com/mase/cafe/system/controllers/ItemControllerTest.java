@@ -26,6 +26,19 @@ class ItemControllerTest {
     }
 
     @Test
+    void deleteItemReturnsNoContent() {
+
+        Long itemId = 1L;
+
+        ResponseEntity<Void> response = itemController.deleteItem(itemId);
+
+        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
+        assertNull(response.getBody());
+
+        verify(itemService, times(1)).deleteItem(itemId);
+    }
+
+    @Test
     void updateItemReturnsUpdatedItem() {
 
         Long itemId = 1L;
