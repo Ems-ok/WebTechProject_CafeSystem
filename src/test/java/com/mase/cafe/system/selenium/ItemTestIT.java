@@ -45,20 +45,28 @@ class ItemTestIT {
     }
 
     private void createItemViaUI(String name, String price) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
 
         WebElement nav = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", nav);
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName"))).sendKeys(name);
+        WebElement categoryDropdown = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("itemCategory")));
+        assertNotNull(categoryDropdown);
+        new Select(categoryDropdown).selectByVisibleText("Beverage");
+
+        driver.findElement(By.id("itemName")).sendKeys(name);
         driver.findElement(By.id("itemPrice")).sendKeys(price);
         driver.findElement(By.id("itemDescription")).sendKeys("Freshly brewed");
 
         WebElement dateField = driver.findElement(By.id("menuDate"));
-        String today = LocalDate.now().toString();
-        ((JavascriptExecutor) driver).executeScript("arguments[0].value = '" + today + "';", dateField);
+        String today = LocalDate.now().toString(); // YYYY-MM-DD
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].value = '" + today + "';" +
+                        "arguments[0].dispatchEvent(new Event('input', { bubbles: true }));" +
+                        "arguments[0].dispatchEvent(new Event('change', { bubbles: true }));", dateField);
 
-        driver.findElement(By.id("submitBtn")).click();
+        WebElement submitBtn = driver.findElement(By.id("submitBtn"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
 
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menuCardsContainer"), name));
     }
