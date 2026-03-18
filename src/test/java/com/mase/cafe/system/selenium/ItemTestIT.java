@@ -123,6 +123,10 @@ class ItemTestIT {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         String itemName = "Hot Chocolate";
 
+        loginAndNavigate();
+
+        createItemViaUI(itemName, "3.50");
+
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".delete-btn")));
 
         WebElement deleteIconButton = wait.until(ExpectedConditions.elementToBeClickable(
@@ -139,7 +143,7 @@ class ItemTestIT {
         confirmDeleteBtn.click();
 
         boolean isDeleted = wait.until(ExpectedConditions.invisibilityOfElementLocated(
-                By.xpath("//span[text()='" + itemName + "']")));
+                By.xpath("//span[contains(text(),'" + itemName + "')]")));
 
         assertTrue(isDeleted, "Item '" + itemName + "' should no longer be visible in the menu cards");
     }
