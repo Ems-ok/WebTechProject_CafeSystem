@@ -37,8 +37,8 @@ class ItemTestIT {
     void setUp() throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new", "--window-size=1920,1080", "--no-sandbox", "--disable-dev-shm-usage");
+
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
-        driver.get(APP_URL);
 
         itemRepository.deleteAll();
         itemRepository.flush();
@@ -47,9 +47,7 @@ class ItemTestIT {
 
         Menu menu = new Menu();
         menu.setMenuDate(LocalDate.now());
-
-        Menu savedMenu = menuRepository.save(menu);
-        menuRepository.flush();
+        Menu savedMenu = menuRepository.saveAndFlush(menu);
 
         Item item = new Item();
         item.setName("Original Latte");
@@ -58,18 +56,21 @@ class ItemTestIT {
         item.setDescription("Freshly brewed");
         item.setMenu(savedMenu);
 
-        Item savedItem = itemRepository.save(item);
-        itemRepository.flush();
-
+        Item savedItem = itemRepository.saveAndFlush(item);
         targetItemId = savedItem.getId();
+
+        driver.get(APP_URL);
     }
 
     private void login() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         wait.until(ExpectedConditions.elementToBeClickable(By.id("username"))).sendKeys("manager");
         driver.findElement(By.id("password")).sendKeys("manager");
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(By.id("submit")));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"brandLink\"]")));
+
+        WebElement submitBtn = driver.findElement(By.id("submit"));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("brandLink")));
     }
 
     @Test
