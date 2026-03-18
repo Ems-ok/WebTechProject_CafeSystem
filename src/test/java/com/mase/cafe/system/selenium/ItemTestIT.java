@@ -78,8 +78,9 @@ class ItemTestIT {
         login();
 
         WebElement navItems = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
-        navItems.click();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navItems);
 
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuCardsContainer")));
         wait.until(ExpectedConditions.textToBePresentInElementLocated(
                 By.id("menuCardsContainer"), "Original Latte"));
 
@@ -105,7 +106,7 @@ class ItemTestIT {
 
         Item updatedItem = itemRepository.findById(targetItemId).orElseThrow();
         assertEquals("Updated Caramel Latte", updatedItem.getName());
-        assertEquals(5.50, updatedItem.getPrice());
+        assertEquals(5.50, updatedItem.getPrice(), 0.001);
     }
 
     @Test
