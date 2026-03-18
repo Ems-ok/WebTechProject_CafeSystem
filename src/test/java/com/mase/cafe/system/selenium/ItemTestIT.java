@@ -118,6 +118,29 @@ class ItemTestIT {
         wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menuCardsContainer"), name));
     }
 
+    @Test
+    void testDeleteItemWithCustomModal() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        String itemName = "Hot Chocolate";
+        WebElement deleteIconButton = wait.until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(".delete-btn")));
+
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", deleteIconButton);
+        deleteIconButton.click();
+
+        WebElement confirmDeleteBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("confirmDeleteBtn")));
+
+        WebElement modalBody = driver.findElement(By.className("modal-body"));
+        assertTrue(modalBody.getText().contains("Are you sure you want to remove this item?"));
+
+        confirmDeleteBtn.click();
+
+        boolean isDeleted = wait.until(ExpectedConditions.invisibilityOfElementWithText(By.id("menuCardsContainer"), itemName));
+
+        assertTrue(isDeleted, "Item should no longer be visible in the menu cards");
+    }
+
     @AfterEach
     void tearDown() {
         if (driver != null) driver.quit();

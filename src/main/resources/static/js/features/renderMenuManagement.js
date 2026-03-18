@@ -63,6 +63,30 @@ export function renderMenuManagement(container) {
             <hr class="my-5">
             <h3 class="fw-bold mb-4">Current Menus</h3>
             <div id="menuCardsContainer" class="row">
+            
+            <hr class="my-5">
+            <h3 class="fw-bold mb-4">Current Menus</h3>
+            <div id="menuCardsContainer" class="row"></div>
+
+                        <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content border-0 shadow">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i>Remove Item</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body p-4 text-center">
+                                        <p class="fs-5 mb-0">Are you sure you want to remove this item?</p>
+                                        <small class="text-muted">This will remove it from all current menus.</small>
+                                    </div>
+                                    <div class="modal-footer border-0 p-3 bg-light">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" id="confirmDeleteBtn" class="btn btn-danger px-4">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
         </div>
     `;
@@ -73,6 +97,10 @@ export function renderMenuManagement(container) {
     const cancelBtn = document.getElementById('cancelEdit');
     const formTitle = document.getElementById('formTitle');
     const editingIdInput = document.getElementById('editingItemId');
+
+    let itemIdToDelete = null;
+    const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
     const loadAllMenus = async () => {
         const token = localStorage.getItem("token");
@@ -148,21 +176,31 @@ export function renderMenuManagement(container) {
         });
 
         document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                if(confirm('Remove this item?')) {
-                    const id = btn.dataset.id;
-                    const token = localStorage.getItem("token");
-                    try {
-                        const res = await fetch(`/manager/api/items/${id}`, {
-                            method: 'DELETE',
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        if(res.ok) loadAllMenus();
-                    } catch (err) { console.error("Delete Failed:", err); }
-                }
+            btn.addEventListener('click', () => {
+                itemIdToDelete = btn.dataset.id;
+                deleteModal.show();
             });
         });
     };
+
+    confirmDeleteBtn.addEventListener('click', async () => {
+        if (!itemIdToDelete) return;
+        const token = localStorage.getItem("token");
+        try {
+            const res = await fetch(`/manager/api/items/${itemIdToDelete}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                deleteModal.hide();
+                loadAllMenus();
+            }
+        } catch (err) {
+            console.error("Delete Failed:", err);
+        } finally {
+            itemIdToDelete = null;
+        }
+    });
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
