@@ -121,8 +121,10 @@ class ItemTestIT {
     @Test
     void testDeleteItemWithCustomModal() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
         String itemName = "Hot Chocolate";
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".delete-btn")));
+
         WebElement deleteIconButton = wait.until(ExpectedConditions.elementToBeClickable(
                 By.cssSelector(".delete-btn")));
 
@@ -131,14 +133,15 @@ class ItemTestIT {
 
         WebElement confirmDeleteBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("confirmDeleteBtn")));
 
-        WebElement modalBody = driver.findElement(By.className("modal-body"));
+        WebElement modalBody = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("modal-body")));
         assertTrue(modalBody.getText().contains("Are you sure you want to remove this item?"));
 
         confirmDeleteBtn.click();
 
-        boolean isDeleted = wait.until(ExpectedConditions.invisibilityOfElementWithText(By.id("menuCardsContainer"), itemName));
+        boolean isDeleted = wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                By.xpath("//span[text()='" + itemName + "']")));
 
-        assertTrue(isDeleted, "Item should no longer be visible in the menu cards");
+        assertTrue(isDeleted, "Item '" + itemName + "' should no longer be visible in the menu cards");
     }
 
     @AfterEach
