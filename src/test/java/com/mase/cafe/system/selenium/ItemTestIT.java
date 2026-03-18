@@ -77,10 +77,11 @@ class ItemTestIT {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         login();
 
-        WebElement navItems = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("nav-menus")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navItems);
+        WebElement navItems = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
+        navItems.click();
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("#menuCardsContainer > div > div > div.card-body.p-0 > ul > li > div.btn-group > button.btn.btn-sm.btn-outline-primary.border-0.edit-btn")));
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(
+                By.id("menuCardsContainer"), "Original Latte"));
 
         WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(By.className("edit-btn")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
