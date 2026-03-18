@@ -127,15 +127,12 @@ class ItemTestIT {
 
         createItemViaUI(itemName, "3.50");
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".delete-btn")));
+        WebElement deleteIconButton = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".delete-btn")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", deleteIconButton);
 
-        WebElement deleteIconButton = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(".delete-btn")));
-
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", deleteIconButton);
-        deleteIconButton.click();
 
         WebElement confirmDeleteBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("confirmDeleteBtn")));
+
 
         WebElement modalBody = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("modal-body")));
         assertTrue(modalBody.getText().contains("Are you sure you want to remove this item?"));
