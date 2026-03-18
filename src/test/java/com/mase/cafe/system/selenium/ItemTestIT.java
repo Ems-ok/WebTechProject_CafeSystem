@@ -80,7 +80,7 @@ class ItemTestIT {
         WebElement navItems = wait.until(ExpectedConditions.presenceOfElementLocated(By.id("nav-menus")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navItems);
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(text(), 'Hot chocolate')]")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@id=\"menuCardsContainer\"]/div/div/div[2]/ul/li/div[1]/span")));
 
         WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(By.className("edit-btn")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
