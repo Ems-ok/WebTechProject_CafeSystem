@@ -9,7 +9,7 @@ services:
           - cafe-app
     ports:
       - "8083:8080"
-      - "8081:8081"
+      - "8082:8081" //test port
       - "50000:50000"
     volumes:
       - jenkins_data:/var/jenkins_home
@@ -33,7 +33,7 @@ services:
       - "--url=daily-lenient-kiwi.ngrok-free.app"
       - "cafe-app:8080"
     environment:
-      NGROK_AUTHTOKEN: "GET FROM NGROK"
+      NGROK_AUTHTOKEN: "3B5pbQZIezCOI5ABJ6UsbeI3e0K_2RfJK8wDhLCQmTnBziDrU"
     networks:
       - cafe-net
     depends_on:
