@@ -103,7 +103,7 @@ class MenuServiceTest {
         existingItem.setPrice(4.50);
         existingItem.setDescription("test");
         existingItem.setCategory("Beverage");
-//        existingItem.setMenu(testMenu);
+
         testMenu.setItems(new HashSet<>(Set.of(existingItem)));
 
         when(menuRepository.findByMenuDate(testDate)).thenReturn(Optional.of(testMenu));

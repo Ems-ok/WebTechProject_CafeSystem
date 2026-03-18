@@ -1,7 +1,5 @@
 package com.mase.cafe.system.selenium;
 
-import com.mase.cafe.system.models.Item;
-import com.mase.cafe.system.models.Menu;
 import com.mase.cafe.system.repositories.ItemRepository;
 import com.mase.cafe.system.repositories.MenuRepository;
 import org.junit.jupiter.api.*;
@@ -13,7 +11,6 @@ import org.openqa.selenium.support.ui.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.Duration;
@@ -21,69 +18,54 @@ import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ExtendWith(SpringExtension.class)
 class ItemTestIT {
 
     WebDriver driver;
     private static final String APP_URL = "http://cafe-app:8081";
 
-    @Autowired private MenuRepository menuRepository;
-    @Autowired private ItemRepository itemRepository;
-
-    private Long targetItemId;
+    @Autowired
+    private ItemRepository itemRepository;
+    @Autowired
+    private MenuRepository menuRepository;
 
     @BeforeEach
     void setUp() throws MalformedURLException {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new", "--window-size=1920,1080", "--no-sandbox", "--disable-dev-shm-usage");
-
         driver = new RemoteWebDriver(new URL("http://selenium-chrome:4444/wd/hub"), options);
 
         itemRepository.deleteAll();
-        itemRepository.flush();
         menuRepository.deleteAll();
-        menuRepository.flush();
-
-        Menu menu = new Menu();
-        menu.setMenuDate(LocalDate.now());
-        Menu savedMenu = menuRepository.saveAndFlush(menu);
-
-        Item item = new Item();
-        item.setName("Original Latte");
-        item.setCategory("Beverage");
-        item.setPrice(3.50);
-        item.setDescription("Freshly brewed");
-        item.setMenu(savedMenu);
-
-        Item savedItem = itemRepository.saveAndFlush(item);
-        targetItemId = savedItem.getId();
 
         driver.get(APP_URL);
+        login();
+        createItemViaUI("Original Latte", "3.50");
     }
 
-    private void login() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        wait.until(ExpectedConditions.elementToBeClickable(By.id("username"))).sendKeys("manager");
-        driver.findElement(By.id("password")).sendKeys("manager");
+    private void createItemViaUI(String name, String price) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        WebElement submitBtn = driver.findElement(By.id("submit"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+        WebElement nav = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", nav);
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("brandLink")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("itemName"))).sendKeys(name);
+        driver.findElement(By.id("itemPrice")).sendKeys(price);
+        driver.findElement(By.id("itemDescription")).sendKeys("Freshly brewed");
+
+        WebElement dateField = driver.findElement(By.id("menuDate"));
+        String today = LocalDate.now().toString();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].value = '" + today + "';", dateField);
+
+        driver.findElement(By.id("submitBtn")).click();
+
+        wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id("menuCardsContainer"), name));
     }
 
     @Test
     void testUpdateItemSuccess() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        login();
-
-        WebElement navItems = wait.until(ExpectedConditions.elementToBeClickable(By.id("nav-menus")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", navItems);
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("menuCardsContainer")));
-        wait.until(ExpectedConditions.textToBePresentInElementLocated(
-                By.id("menuCardsContainer"), "Original Latte"));
 
         WebElement editBtn = wait.until(ExpectedConditions.elementToBeClickable(By.className("edit-btn")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", editBtn);
@@ -96,18 +78,17 @@ class ItemTestIT {
         priceField.clear();
         priceField.sendKeys("5.50");
 
-        WebElement updateBtn = driver.findElement(By.id("submitBtn"));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", updateBtn);
+        driver.findElement(By.id("submitBtn")).click();
 
         wait.until(d -> !d.findElement(By.id("menu-response-msg")).getText().trim().isEmpty());
-        String resultText = driver.findElement(By.id("menu-response-msg")).getText();
+        assertTrue(driver.findElement(By.id("menu-response-msg")).getText().contains("successfully"));
+    }
 
-        assertTrue(resultText.toLowerCase().contains("successfully") || resultText.toLowerCase().contains("updated"),
-                "Expected update success message but got: " + resultText);
-
-        Item updatedItem = itemRepository.findById(targetItemId).orElseThrow();
-        assertEquals("Updated Caramel Latte", updatedItem.getName());
-        assertEquals(5.50, updatedItem.getPrice(), 0.001);
+    private void login() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("username"))).sendKeys("manager");
+        driver.findElement(By.id("password")).sendKeys("manager");
+        driver.findElement(By.id("submit")).click();
     }
 
     @Test

@@ -58,7 +58,7 @@ class ItemServiceTest {
         assertEquals("New Name", result.getName());
         assertEquals("Beverage", result.getCategory());
         assertEquals(5.50, result.getPrice());
-        assertEquals(10L, result.getMenuId()); // Verify menu ID mapping
+        assertEquals(10L, result.getMenuId());
 
         verify(itemRepository, times(1)).findById(itemId);
         verify(itemRepository, times(1)).save(existingItem);
