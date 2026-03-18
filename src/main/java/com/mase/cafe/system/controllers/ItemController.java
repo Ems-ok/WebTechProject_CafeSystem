@@ -19,4 +19,10 @@ public class ItemController {
         return ResponseEntity.ok(itemService.updateItem(id, itemDto));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
+        itemService.deleteItem(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }
