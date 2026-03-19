@@ -1,4 +1,4 @@
-export const pendingDeleteUserId = null;
+export let pendingDeleteUserId = null;
 
 export function renderUserManagement(root) {
     const modalContainer = document.getElementById('modal-container');
@@ -30,7 +30,6 @@ export function renderUserManagement(root) {
         </div>
     `;
 
-    // Inject modals into the modal container
     modalContainer.innerHTML = getUserModalsHTML();
 
     initUserTable();
