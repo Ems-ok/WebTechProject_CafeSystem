@@ -23,7 +23,7 @@ public class UserService implements UserDetailsService {
 
     private UserDTO convertToDto(User user) {
         if (user == null) return null;
-        
+
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
@@ -92,6 +92,7 @@ public class UserService implements UserDetailsService {
 
         return convertToDto(userRepository.save(existingUser));
     }
+
 
     public void deleteUser(Long id, String currentUsername) {
         User user = userRepository.findById(id).orElse(null);

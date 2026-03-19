@@ -6,5 +6,6 @@ import com.mase.cafe.system.models.User;
 
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
-	User findByUsername(String username);	
+
+	User findByUsername(String username);
 }

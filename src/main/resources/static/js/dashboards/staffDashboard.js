@@ -1,37 +1,27 @@
 export async function renderStaffDashboard(dashboardRoot) {
     if (!dashboardRoot) return;
 
-    // 1. Initial Loading State
     dashboardRoot.innerHTML = `<div class="text-center p-5"><div class="spinner-border text-primary"></div></div>`;
 
     try {
-        // 2. Fetch today's menu to update staff on what's available
         const todayStr = new Date().toISOString().split('T')[0];
-        const response = await fetch(`/manager/api/menus/date?date=${todayStr}`, {
-            headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
-        });
+        const headers = { 'Authorization': `Bearer ${localStorage.getItem("token")}` };
+
+        const menuResponse= await fetch(`/manager/api/menus/date?date=${todayStr}`, { headers });
 
         let menuItems = [];
-        if (response.ok) {
-            const menu = await response.json();
+        if (menuResponse.ok) {
+            const menu = await menuResponse.json();
             menuItems = menu.items || [];
         }
 
-        // 3. Render Dashboard
         dashboardRoot.innerHTML = `
         <div class="container-fluid animate__animated animate__fadeIn">
           <div class="row mb-4 align-items-center">
             <div class="col">
-              <h2 class="fw-bold mb-1">Staff Terminal</h2>
+              <h2 class="fw-bold mb-1">Staff Dashboard</h2>
               <div class="text-muted">Operational updates for ${new Date().toLocaleDateString()}</div>
             </div>
-          </div>
-
-          <div class="row g-4 mb-4">
-            ${renderStatCard('Active Orders', '12', 'bi-cart-check', 'text-primary')}
-            ${renderStatCard('Out of Stock', menuItems.length === 0 ? 'All' : '3', 'bi-exclamation-octagon', 'text-danger')}
-            ${renderStatCard('Staff on Shift', '4', 'bi-people', 'text-success')}
-            ${renderStatCard('Daily Goal', '75%', 'bi-graph-up-arrow', 'text-warning')}
           </div>
 
           <div class="row g-4">
@@ -71,14 +61,6 @@ export async function renderStaffDashboard(dashboardRoot) {
                   </ul>
                 </div>
               </div>
-
-              <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                  <h6 class="fw-bold mb-3">Quick Actions</h6>
-                  <div class="d-grid gap-2">
-                    <button class="btn btn-outline-primary btn-sm text-start"><i class="bi bi-plus-circle me-2"></i> New Order</button>
-                    <button class="btn btn-outline-secondary btn-sm text-start"><i class="bi bi-box-seam me-2"></i> Mark Out of Stock</button>
-                  </div>
                 </div>
               </div>
             </div>
@@ -86,24 +68,8 @@ export async function renderStaffDashboard(dashboardRoot) {
         </div>
       `;
     } catch (error) {
+        console.error("Dashboard Error:", error);
         dashboardRoot.innerHTML = `<div class="alert alert-danger">Error loading dashboard data.</div>`;
     }
-}
 
-function renderStatCard(title, value, icon, textColor) {
-    return `
-    <div class="col-12 col-sm-6 col-xl-3">
-      <div class="card border-0 shadow-sm p-3 h-100">
-        <div class="d-flex align-items-center">
-          <div class="flex-shrink-0 p-3 rounded-3 bg-light ${textColor}">
-            <i class="bi ${icon} fs-3"></i>
-          </div>
-          <div class="flex-grow-1 ms-3">
-            <div class="text-muted small fw-medium">${title}</div>
-            <div class="fs-4 fw-bold">${value}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
 }
