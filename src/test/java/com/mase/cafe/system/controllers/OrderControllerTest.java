@@ -8,6 +8,7 @@ import com.mase.cafe.system.models.Order;
 import com.mase.cafe.system.models.User;
 import com.mase.cafe.system.repositories.OrderRepository;
 import com.mase.cafe.system.repositories.UserRepository;
+import com.mase.cafe.system.services.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -20,39 +21,44 @@ import java.util.Optional;
 class OrderControllerTest {
 
     private OrderRepository orderRepository;
-    private UserRepository userRepository;
+    private OrderService orderService;
     private OrderController orderController;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
         orderRepository = mock(OrderRepository.class);
-        userRepository = mock(UserRepository.class);
+        orderService = mock(OrderService.class);
 
-        orderController = new OrderController(userRepository, orderRepository);
+        orderController = new OrderController(orderService, orderRepository);
     }
 
     @Test
     void createOrderReturnsCreatedStatus() {
+
         String username = "testuser";
         Principal mockPrincipal = mock(Principal.class);
         when(mockPrincipal.getName()).thenReturn(username);
 
-        User mockUser = new User();
-        mockUser.setUsername(username);
-        when(userRepository.findByUsername(username)).thenReturn(mockUser);
-
         Order inputOrder = new Order();
         inputOrder.setOrdername("Table 5 - Coffee");
-        inputOrder.setTotalAmount(15.50);
 
-        when(orderRepository.save(any(Order.class))).thenReturn(inputOrder);
+        Order savedOrder = new Order();
+        savedOrder.setId(1L);
+        savedOrder.setOrdername("Table 5 - Coffee");
+
+        OrderDTO expectedDto = new OrderDTO();
+        expectedDto.setId(1L);
+        expectedDto.setOrdername("Table 5 - Coffee");
+
+        when(orderService.saveOrder(any(Order.class), eq(username))).thenReturn(savedOrder);
+        when(orderService.convertToDTO(savedOrder)).thenReturn(expectedDto);
 
         ResponseEntity<?> response = orderController.createOrder(inputOrder, mockPrincipal);
 
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        verify(orderRepository, times(1)).save(any(Order.class));
-        verify(userRepository, times(1)).findByUsername(username);
+        assertNotNull(response.getBody());
+        verify(orderService, times(1)).saveOrder(any(Order.class), eq(username));
     }
 
     @Test
@@ -62,9 +68,13 @@ class OrderControllerTest {
         Order mockOrder = new Order();
         mockOrder.setId(orderId);
         mockOrder.setOrdername("Expresso Shot");
-        mockOrder.setTotalAmount(3.50);
+
+        OrderDTO mockDto = new OrderDTO();
+        mockDto.setId(orderId);
+        mockDto.setOrdername("Expresso Shot");
 
         when(orderRepository.findById(orderId)).thenReturn(Optional.of(mockOrder));
+        when(orderService.convertToDTO(mockOrder)).thenReturn(mockDto);
 
         ResponseEntity<?> response = orderController.getOrderById(orderId);
 
@@ -80,33 +90,41 @@ class OrderControllerTest {
     void updateOrderReturnsOk() {
 
         Long orderId = 1L;
-        Order existingOrder = new Order();
-        existingOrder.setId(orderId);
+        String username = "testuser";
+        Principal mockPrincipal = mock(Principal.class);
+        when(mockPrincipal.getName()).thenReturn(username);
 
         Order updatedDetails = new Order();
         updatedDetails.setOrdername("Updated Table Name");
-        updatedDetails.setTotalAmount(20.00);
 
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(existingOrder));
+        Order updatedOrder = new Order();
+        updatedOrder.setId(orderId);
+        updatedOrder.setOrdername("Updated Table Name");
 
-        ResponseEntity<?> response = orderController.updateOrder(orderId, updatedDetails);
+        OrderDTO resultDto = new OrderDTO();
+        resultDto.setOrdername("Updated Table Name");
+
+        when(orderService.updateOrder(eq(orderId), any(Order.class), eq(username))).thenReturn(updatedOrder);
+        when(orderService.convertToDTO(updatedOrder)).thenReturn(resultDto);
+
+        ResponseEntity<?> response = orderController.updateOrder(orderId, updatedDetails, mockPrincipal);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(orderRepository, times(1)).save(existingOrder);
-        assertEquals("Updated Table Name", existingOrder.getOrdername());
+        verify(orderService, times(1)).updateOrder(eq(orderId), any(Order.class), eq(username));
+        assertEquals("Updated Table Name", ((OrderDTO)response.getBody()).getOrdername());
     }
 
     @Test
     void deleteOrderReturnsOk() {
 
         Long orderId = 1L;
-        Order mockOrder = new Order();
-        when(orderRepository.findById(orderId)).thenReturn(Optional.of(mockOrder));
+
+        doNothing().when(orderService).deleteOrder(orderId);
 
         ResponseEntity<?> response = orderController.deleteOrder(orderId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(orderRepository, times(1)).delete(mockOrder);
+        verify(orderService, times(1)).deleteOrder(orderId);
     }
 
     @Test

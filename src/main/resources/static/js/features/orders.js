@@ -1,7 +1,7 @@
 let pendingDeleteOrderId = null;
+let menuItems = [];
 
 export function renderNewOrderForm(root) {
-
     const modalContainer = document.getElementById('modal-container');
 
     root.innerHTML = `
@@ -78,40 +78,79 @@ function initOrderTable() {
     });
 }
 
+function calculateTotal() {
+    const itemName = $('#ordername').val();
+    const quantity = parseInt($('#quantity').val()) || 0;
+    const selectedItem = menuItems.find(item => item.name === itemName);
+
+    if (selectedItem && quantity > 0) {
+        const total = selectedItem.price * quantity;
+        $('#totalAmount').val(total.toFixed(2));
+    } else {
+        $('#totalAmount').val('0.00');
+    }
+}
+
 function bindOrderEvents() {
     $('#openAddOrderBtn').off('click').on('click', () => {
-        $('#orderForm')[0].reset();
+
         $('#orderId').val('');
+        $('#quantity').val(1);
+        $('#totalAmount').val('0.00');
+
+        const form = $('#orderForm')[0];
+        if(form) form.reset();
+
         $('#orderModalLabel').text('Add New Order');
-        $('#orderModal').modal('show');
+
+        fetchItemsAndPopulate(() => {
+            $('#ordername').val('');
+            $('#orderModal').modal('show');
+        });
     });
 
     $('#orderTable').off('click', '.edit-btn').on('click', '.edit-btn', function () {
         const id = $(this).data('id');
-        $.ajax({
-            url: `/api/orders/${id}`,
-            method: 'GET',
-            headers: getAuthHeaders()
-        })
-            .done(order => {
-                $('#orderId').val(order.id);
-                $('#ordername').val(order.ordername);
-                $('#totalAmount').val(order.totalAmount);
-                $('#orderModalLabel').text('Edit Order');
-                $('#orderModal').modal('show');
+        fetchItemsAndPopulate(() => {
+            $.ajax({
+                url: `/api/orders/${id}`,
+                method: 'GET',
+                headers: getAuthHeaders()
             })
-            .fail(() => alert('Error loading order details'));
+                .done(order => {
+                    $('#orderId').val(order.id);
+                    $('#ordername').val(order.ordername);
+                    $('#totalAmount').val(order.totalAmount.toFixed(2));
+                    $('#quantity').val(1); // Default quantity for edit
+                    $('#orderModalLabel').text('Edit Order');
+                    $('#orderModal').modal('show');
+                })
+                .fail(() => alert('Error loading order details'));
+        });
     });
+
+    $(document).off('change', '#ordername').on('change', '#ordername', calculateTotal);
+    $(document).off('input', '#quantity').on('input', '#quantity', calculateTotal);
 
     $('#saveOrderBtn').off('click').on('click', function () {
         const id = $('#orderId').val();
+        const itemName = $('#ordername').val();
+        const quantity = parseInt($('#quantity').val());
+        const totalDisplay = parseFloat($('#totalAmount').val());
+
         const orderData = {
-            ordername: $('#ordername').val().trim(),
-            totalAmount: parseFloat($('#totalAmount').val())
+            ordername: "Order for " + itemName,
+            totalAmount: totalDisplay,
+            orderItems: [
+                {
+                    item: { name: itemName },
+                    quantity: quantity
+                }
+            ]
         };
 
-        if (!orderData.ordername || isNaN(orderData.totalAmount)) {
-            alert("Order Name and Total Amount are required.");
+        if (!itemName || isNaN(quantity) || quantity <= 0 || totalDisplay <= 0) {
+            alert("Please select an item and a valid quantity.");
             return;
         }
 
@@ -119,6 +158,7 @@ function bindOrderEvents() {
         const url = id ? `/api/orders/${id}` : '/api/orders';
 
         $('#saveOrderBtn').prop('disabled', true);
+
         $.ajax({
             url: url,
             method: method,
@@ -128,9 +168,14 @@ function bindOrderEvents() {
         })
             .done(() => {
                 $('#orderModal').modal('hide');
+                $('#orderId').val('');
                 $('#orderTable').DataTable().ajax.reload();
             })
-            .fail(xhr => alert('Error saving order'))
+            .fail(xhr => {
+                console.error("Server Error:", xhr.responseText);
+                const errorMsg = xhr.responseJSON ? xhr.responseJSON.message : "Check server logs (500/400 error)";
+                alert('Error saving order: ' + errorMsg);
+            })
             .always(() => $('#saveOrderBtn').prop('disabled', false));
     });
 
@@ -140,9 +185,6 @@ function bindOrderEvents() {
     });
 
     $('#confirmDeleteBtn').off('click').on('click', function () {
-        const btn = $(this);
-        btn.prop('disabled', true);
-
         $.ajax({
             url: `/api/orders/${pendingDeleteOrderId}`,
             method: 'DELETE',
@@ -150,21 +192,35 @@ function bindOrderEvents() {
         })
             .done(() => {
                 $('#deleteOrderModal').modal('hide');
-                $('#orderTable').DataTable().ajax.reload(); // Refresh the table
+                $('#orderTable').DataTable().ajax.reload();
             })
-            .fail(xhr => {
-                alert("Delete failed: " + (xhr.responseText || "Server error"));
-            })
-            .always(() => {
-                btn.prop('disabled', false);
-            });
+            .fail(xhr => alert("Delete failed"));
     });
+}
+
+function fetchItemsAndPopulate(callback) {
+    $.ajax({
+        url: '/manager/api/items',
+        method: 'GET',
+        headers: getAuthHeaders()
+    })
+        .done(items => {
+            menuItems = items;
+            let options = '<option value="" disabled selected>Choose an item...</option>';
+            items.forEach(item => {
+
+                options += `<option value="${item.name}" data-price="${item.price}">${item.name} ($${item.price.toFixed(2)})</option>`;
+            });
+            $('#ordername').html(options);
+            if (callback) callback();
+        })
+        .fail(() => alert('Failed to load menu items. Verify the API path.'));
 }
 
 function getOrderModalsHTML() {
     return `
         <div class="modal fade" id="orderModal" tabindex="-1">
-        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="orderModalLabel">Order Details</h5>
@@ -174,12 +230,18 @@ function getOrderModalsHTML() {
                         <form id="orderForm">
                             <input type="hidden" id="orderId">
                             <div class="mb-3">
-                                <label class="form-label">Order Name (Reference)</label>
-                                <input type="text" class="form-control" id="ordername" placeholder="e.g. Table 5 - Coffee" required>
+                                <label class="form-label">Select Item</label>
+                                <select class="form-select" id="ordername" required>
+                                    <option value="" disabled selected>Loading...</option>
+                                </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Total Amount ($)</label>
-                                <input type="number" step="0.01" class="form-control" id="totalAmount" required>
+                                <label class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="quantity" min="1" value="1" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Total Amount (€)</label>
+                                <input type="text" class="form-control bg-light" id="totalAmount" readonly value="0.00">
                             </div>
                         </form>
                     </div>

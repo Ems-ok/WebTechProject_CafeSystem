@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import com.mase.cafe.system.dtos.OrderDTO;
 import com.mase.cafe.system.models.Order;
 import com.mase.cafe.system.models.User;
+import com.mase.cafe.system.repositories.ItemRepository;
 import com.mase.cafe.system.repositories.OrderRepository;
 import com.mase.cafe.system.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ class OrderServiceTest {
 
     private OrderRepository orderRepository;
     private UserRepository userRepository;
+    private ItemRepository itemRepository;
     private OrderService orderService;
 
     @BeforeEach
@@ -28,7 +30,7 @@ class OrderServiceTest {
         orderRepository = mock(OrderRepository.class);
         userRepository = mock(UserRepository.class);
 
-        orderService = new OrderService(orderRepository, userRepository);
+        orderService = new OrderService(orderRepository, userRepository,itemRepository);
     }
 
     @Test

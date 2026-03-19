@@ -1,15 +1,11 @@
 package com.mase.cafe.system.models;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "order_items")
-@Getter
-@Setter
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +16,7 @@ public class OrderItem {
     private Order order;
 
     @ManyToOne
+    @JoinColumn(name = "item_id")
     private Item item;
 
     private Integer quantity;

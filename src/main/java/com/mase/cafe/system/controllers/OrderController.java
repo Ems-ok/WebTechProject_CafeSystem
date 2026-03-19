@@ -2,9 +2,8 @@ package com.mase.cafe.system.controllers;
 
 import com.mase.cafe.system.dtos.OrderDTO;
 import com.mase.cafe.system.models.Order;
-import com.mase.cafe.system.models.User;
 import com.mase.cafe.system.repositories.OrderRepository;
-import com.mase.cafe.system.repositories.UserRepository;
+import com.mase.cafe.system.services.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -20,86 +19,62 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderController {
 
-    private final UserRepository userRepository;
+    private final OrderService orderService;
     private final OrderRepository orderRepository;
 
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody Order order, Principal principal) {
-        String username = principal.getName();
-        User user = userRepository.findByUsername(username);
-
-        if (user == null) {
-            return ResponseEntity.status(401).body("Error: Logged-in user not found.");
-        }
-
-        order.setUser(user);
-
-        if (order.getOrderItems() != null) {
-            order.getOrderItems().forEach(item -> item.setOrder(order));
-        }
-
         try {
-            Order savedOrder = orderRepository.save(order);
-            return ResponseEntity.status(201).body(savedOrder);
+            Order savedOrder = orderService.saveOrder(order, principal.getName());
+            // Return DTO to prevent infinite recursion crash
+            return ResponseEntity.status(201).body(orderService.convertToDTO(savedOrder));
         } catch (Exception e) {
-            return ResponseEntity.status(400).body("Backend Error: " + e.getMessage());
+            return ResponseEntity.status(400).body(e.getMessage());
         }
     }
 
     @GetMapping
     public List<OrderDTO> getAllOrders() {
-        return orderRepository.findAll().stream().map(order -> {
-            OrderDTO dto = new OrderDTO();
-            dto.setId(order.getId());
-            dto.setOrdername(order.getOrdername());
-            dto.setTotalAmount(order.getTotalAmount());
-            dto.setOrderTimestamp(order.getOrderTimestamp());
-            if (order.getUser() != null) {
-                dto.setUsername(order.getUser().getUsername());
-            }
-            return dto;
-        }).collect(Collectors.toList());
+        // Uses service to get clean DTO list
+        return orderService.getAllOrders();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
-        return orderRepository.findById(id).map(order -> {
-
-            OrderDTO dto = new OrderDTO();
-            dto.setId(order.getId());
-            dto.setOrdername(order.getOrdername());
-            dto.setTotalAmount(order.getTotalAmount());
-            dto.setOrderTimestamp(order.getOrderTimestamp());
-
-            return ResponseEntity.ok(dto);
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<OrderDTO> getOrderById(@PathVariable Long id) {
+        return orderRepository.findById(id)
+                .map(order -> ResponseEntity.ok(orderService.convertToDTO(order)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/search")
-    public List<Order> getOrdersByTime(
+    public List<OrderDTO> getOrdersByTime(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
 
-        return orderRepository.findByOrderTimestampBetween(start, end);
+        return orderRepository.findByOrderTimestampBetween(start, end)
+                .stream()
+                .map(orderService::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody Order orderDetails) {
-        return orderRepository.findById(id).map(order -> {
-            order.setOrdername(orderDetails.getOrdername());
-            order.setTotalAmount(orderDetails.getTotalAmount());
-            orderRepository.save(order);
-
-            return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody Order orderDetails, Principal principal) {
+        try {
+            // Using a service method ensures items and totals are recalculated correctly
+            Order updated = orderService.updateOrder(id, orderDetails, principal.getName());
+            return ResponseEntity.ok(orderService.convertToDTO(updated));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrder(@PathVariable Long id) {
-        return orderRepository.findById(id).map(order -> {
-            orderRepository.delete(order);
+        try {
+            orderService.deleteOrder(id);
             return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
     }
-
 }
