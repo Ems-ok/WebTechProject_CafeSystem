@@ -140,6 +140,9 @@ function bindOrderEvents() {
     });
 
     $('#confirmDeleteBtn').off('click').on('click', function () {
+        const btn = $(this);
+        btn.prop('disabled', true);
+
         $.ajax({
             url: `/api/orders/${pendingDeleteOrderId}`,
             method: 'DELETE',
@@ -147,7 +150,13 @@ function bindOrderEvents() {
         })
             .done(() => {
                 $('#deleteOrderModal').modal('hide');
-                $('#orderTable').DataTable().ajax.reload();
+                $('#orderTable').DataTable().ajax.reload(); // Refresh the table
+            })
+            .fail(xhr => {
+                alert("Delete failed: " + (xhr.responseText || "Server error"));
+            })
+            .always(() => {
+                btn.prop('disabled', false);
             });
     });
 }
