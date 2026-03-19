@@ -36,4 +36,7 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id")
     private Menu menu;
+    
+    @Column(nullable = false)
+    private boolean available = true;
 }

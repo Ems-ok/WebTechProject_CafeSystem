@@ -1,5 +1,6 @@
 package com.mase.cafe.system.dtos;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

@@ -58,4 +58,12 @@ public class ItemService {
 
         itemRepository.delete(item);
     }
+
+    public void markItemOutOfStock(Long id) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
+
+        item.setAvailable(false);
+        itemRepository.save(item);
+    }
 }

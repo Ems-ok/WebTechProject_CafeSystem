@@ -1,10 +1,12 @@
 package com.mase.cafe.system.controllers;
 
 import com.mase.cafe.system.dtos.ItemDTO;
+import com.mase.cafe.system.models.Item;
 import com.mase.cafe.system.services.ItemService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -24,5 +26,13 @@ public class ItemController {
         itemService.deleteItem(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/out-of-stock")
+    @PreAuthorize("hasAnyRole('STAFF')")
+    public ResponseEntity<Void> markOutOfStock(@PathVariable Long id) {
+        itemService.markItemOutOfStock(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
