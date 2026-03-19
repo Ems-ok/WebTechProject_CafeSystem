@@ -8,6 +8,9 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Table(name = "users")
@@ -34,4 +37,7 @@ public class User {
     @NotBlank(message = "Role is required")
     @Column(name = "role", nullable = false)
     private String role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
 }
