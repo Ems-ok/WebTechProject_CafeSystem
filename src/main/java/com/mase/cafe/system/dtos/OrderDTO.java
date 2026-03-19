@@ -1,14 +1,15 @@
 package com.mase.cafe.system.dtos;
 
-import com.mase.cafe.system.models.Order;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import java.util.List;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 public class OrderDTO {
-    private List<Order> orders;
-    private double totalRevenue;
-    private int orderCount;
+    private Long id;
+    private String ordername;
+    private Double totalAmount;
+    private LocalDateTime orderTimestamp;
+    private String username;
 }

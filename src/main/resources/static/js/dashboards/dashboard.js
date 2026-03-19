@@ -3,6 +3,7 @@ import { renderUserManagement } from "../features/userManagement.js";
 import { renderMenuManagement } from "../features/renderMenuManagement.js";
 import { renderStaffDashboard } from "./staffDashboard.js";
 import {renderMenuView} from "../features/ViewMenu.js";
+import {renderNewOrderForm} from "../features/orders.js";
 
 function getUserRole() {
     const token = localStorage.getItem("token");
@@ -81,6 +82,12 @@ export function renderDashboard(mainAppDiv) {
                                 <i class="bi bi-book-half me-2"></i> View Menus
                             </a>
                         </li>
+                         
+                         <li class="nav-item role-restricted" data-allowed="STAFF">
+                            <a class="nav-link" href="#" id="nav-orders">
+                                <i class="bi bi-pencil-square me-2"></i> Orders
+                            </a>
+                        </li>
                     </ul>
                 </nav>
                 <main class="col-md-10 main-content">
@@ -129,6 +136,12 @@ export function renderDashboard(mainAppDiv) {
         e.preventDefault();
         renderMenuView($("#dashboard-root")[0]);
     });
+
+    $("#nav-orders").click(e => {
+        e.preventDefault();
+        renderNewOrderForm($("#dashboard-root")[0]);
+    });
+
 
     if (userRole === "MANAGER") {
         renderManagerDashboard($("#dashboard-root")[0]);
