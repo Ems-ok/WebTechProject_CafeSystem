@@ -61,12 +61,37 @@ public class OrderController {
         }).collect(Collectors.toList());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getOrderById(@PathVariable Long id) {
+        return orderRepository.findById(id).map(order -> {
+
+            OrderDTO dto = new OrderDTO();
+            dto.setId(order.getId());
+            dto.setOrdername(order.getOrdername());
+            dto.setTotalAmount(order.getTotalAmount());
+            dto.setOrderTimestamp(order.getOrderTimestamp());
+
+            return ResponseEntity.ok(dto);
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/search")
     public List<Order> getOrdersByTime(
             @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
             @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
 
         return orderRepository.findByOrderTimestampBetween(start, end);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateOrder(@PathVariable Long id, @RequestBody Order orderDetails) {
+        return orderRepository.findById(id).map(order -> {
+            order.setOrdername(orderDetails.getOrdername());
+            order.setTotalAmount(orderDetails.getTotalAmount());
+            orderRepository.save(order);
+
+            return ResponseEntity.ok().build();
+        }).orElse(ResponseEntity.notFound().build());
     }
 
 }
