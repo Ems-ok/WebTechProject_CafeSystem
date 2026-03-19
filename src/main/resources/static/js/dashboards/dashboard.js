@@ -1,6 +1,8 @@
-import {renderManagerDashboard} from "./managerDashboard.js";
-import {renderUserManagement} from "../features/userManagement.js";
-import { renderMenuManagement } from "../features/renderMenuManagement.js"
+import { renderManagerDashboard } from "./managerDashboard.js";
+import { renderUserManagement } from "../features/userManagement.js";
+import { renderMenuManagement } from "../features/renderMenuManagement.js";
+import { renderStaffDashboard } from "./staffDashboard.js";
+import {renderMenuView} from "../features/ViewMenu.js";
 
 function getUserRole() {
     const token = localStorage.getItem("token");
@@ -11,7 +13,7 @@ function getUserRole() {
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const payload = JSON.parse(window.atob(base64));
 
-        console.log("Debugging Token Payload:", payload); // Look at this in F12!
+        console.log("Debugging Token Payload:", payload);
 
         let rawRole = payload.role || payload.roles || payload.authorities || payload.auth;
 
@@ -24,7 +26,6 @@ function getUserRole() {
         }
 
         if (!rawRole) rawRole = payload.sub;
-
         if (!rawRole) return null;
 
         return rawRole.toString().toUpperCase().replace("ROLE_", "");
@@ -57,6 +58,11 @@ export function renderDashboard(mainAppDiv) {
                                 <i class="bi bi-speedometer2 me-2"></i> Dashboard
                             </a>
                         </li>
+                        <li class="nav-item role-restricted" data-allowed="STAFF">
+                            <a class="nav-link" href="#" id="staff-dashboard">
+                                <i class="bi bi-speedometer2 me-2"></i> Staff Portal
+                            </a>
+                        </li>
                     
                         <li class="nav-item role-restricted" data-allowed="MANAGER">
                             <a class="nav-link" href="#" id="nav-users">
@@ -67,6 +73,12 @@ export function renderDashboard(mainAppDiv) {
                         <li class="nav-item role-restricted" data-allowed="MANAGER">
                             <a class="nav-link" href="#" id="nav-menus">
                                 <i class="bi bi-journal-text me-2"></i> Menu Management
+                            </a>
+                        </li> 
+                        
+                        <li class="nav-item role-restricted" data-allowed="STAFF">
+                            <a class="nav-link" href="#" id="nav-menus-view">
+                                <i class="bi bi-book-half me-2"></i> View Menus
                             </a>
                         </li>
                     </ul>
@@ -79,47 +91,50 @@ export function renderDashboard(mainAppDiv) {
         <div id="modal-container"></div>
     `;
 
-    $(".role-restricted").each(function() {
+    $(".role-restricted").each(function () {
         const allowedStr = $(this).attr("data-allowed") || "";
         const allowedRoles = allowedStr.split(',').map(r => r.trim());
 
         if (!allowedRoles.includes(userRole)) {
-            console.log(`Removing item because ${userRole} is not in ${allowedRoles}`);
-            $(this).remove();
-        }
-
-        if (!allowedRoles.includes(userRole)) {
             $(this).remove();
         }
     });
 
-    $("#logout_button").click(function () {
+    $("#logout_button").click(() => {
         localStorage.removeItem("token");
         globalThis.location.reload();
     });
 
-    $("#nav-dashboard").click(function (e) {
+    $("#nav-dashboard").click(e => {
         e.preventDefault();
-        if (userRole === "MANAGER") {
-            renderManagerDashboard($("#dashboard-root")[0]);
-        } else {
-            renderMenuManagement($("#dashboard-root")[0]);
-        }
+        renderManagerDashboard($("#dashboard-root")[0]);
     });
 
-    $("#nav-users").click(function (e) {
+    $("#staff-dashboard").click(e => {
+        e.preventDefault();
+        renderStaffDashboard($("#dashboard-root")[0]);
+    });
+
+    $("#nav-users").click(e => {
         e.preventDefault();
         renderUserManagement($("#dashboard-root")[0]);
     });
 
-    $("#nav-menus").click(function (e) {
+    $("#nav-menus").click(e => {
         e.preventDefault();
         renderMenuManagement($("#dashboard-root")[0]);
     });
 
+    $("#nav-menus-view").click(e => {
+        e.preventDefault();
+        renderMenuView($("#dashboard-root")[0]);
+    });
+
     if (userRole === "MANAGER") {
         renderManagerDashboard($("#dashboard-root")[0]);
+    } else if (userRole === "STAFF") {
+        renderStaffDashboard($("#dashboard-root")[0]);
     } else {
-        renderMenuManagement($("#dashboard-root")[0]);
+        $("#dashboard-root").html('<div class="alert alert-danger">Error: Unknown User Role</div>');
     }
 }

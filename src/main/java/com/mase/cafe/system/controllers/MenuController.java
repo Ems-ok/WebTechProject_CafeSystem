@@ -16,19 +16,20 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/manager/api/menus")
-@PreAuthorize("hasRole('MANAGER')")
 @RequiredArgsConstructor
 public class MenuController {
 
     private final MenuService menuService;
 
     @PostMapping
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<MenuDTO> createMenu(@RequestBody MenuDTO menuDto) {
         MenuDTO savedMenu = menuService.createMenu(menuDto.getMenuDate());
         return ResponseEntity.status(201).body(savedMenu);
     }
 
     @PostMapping("/create-and-add")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<MenuDTO> createAndAdd(
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate date,
             @Valid @RequestBody ItemDTO itemDto) {
@@ -45,11 +46,13 @@ public class MenuController {
 
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('MANAGER', 'STAFF')")
     public List<MenuDTO> getAllMenus() {
         return menuService.getAllMenus();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MANAGER', 'STAFF')")
     public ResponseEntity<MenuDTO> getMenuById(@PathVariable Long id) {
         return menuService.getMenuById(id)
                 .map(ResponseEntity::ok)
@@ -58,6 +61,7 @@ public class MenuController {
 
 
     @GetMapping("/date")
+    @PreAuthorize("hasAnyRole('MANAGER', 'STAFF')")
     public ResponseEntity<MenuDTO> getMenuByDate(
             @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         MenuDTO menu = menuService.getMenuByDate(date);
