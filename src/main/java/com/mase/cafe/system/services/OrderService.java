@@ -1,6 +1,7 @@
 package com.mase.cafe.system.services;
 
 import com.mase.cafe.system.dtos.OrderDTO;
+import com.mase.cafe.system.dtos.TopSellingItemDTO;
 import com.mase.cafe.system.exceptions.ValidationException;
 import com.mase.cafe.system.models.Item;
 import com.mase.cafe.system.models.Order;
@@ -10,6 +11,7 @@ import com.mase.cafe.system.repositories.ItemRepository;
 import com.mase.cafe.system.repositories.OrderRepository;
 import com.mase.cafe.system.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; // Import this
 
@@ -86,6 +88,19 @@ public class OrderService {
         orderRepository.delete(order);
     }
 
+    public List<TopSellingItemDTO> getTopSellingItems() {
+
+        List<TopSellingItemDTO> topItems = orderRepository.findTopSellingItems(PageRequest.of(0, 5));
+
+        if (!topItems.isEmpty()) {
+            long maxSold = topItems.get(0).getTotalSold();
+            topItems.forEach(item -> {
+                double pct = (maxSold > 0) ? (item.getTotalSold() * 100.0 / maxSold) : 0;
+                item.setPercentage(pct);
+            });
+        }
+        return topItems;
+    }
     public OrderDTO convertToDTO(Order order) {
         OrderDTO dto = new OrderDTO();
         dto.setId(order.getId());

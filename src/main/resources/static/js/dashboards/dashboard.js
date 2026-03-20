@@ -76,7 +76,7 @@ export function renderDashboard(mainAppDiv) {
                                 <i class="bi bi-journal-text me-2"></i> Menu Management
                             </a>
                         </li> 
-                        
+                 
                         <li class="nav-item role-restricted" data-allowed="STAFF">
                             <a class="nav-link" href="#" id="nav-menus-view">
                                 <i class="bi bi-book-half me-2"></i> View Menus
@@ -140,6 +140,12 @@ export function renderDashboard(mainAppDiv) {
     $("#nav-orders").click(e => {
         e.preventDefault();
         renderNewOrderForm($("#dashboard-root")[0]);
+    });
+
+    $("#nav-top-selling").click(e => {
+        e.preventDefault();
+        $("#dashboard-root").empty();
+        fetchTopSellingItems();
     });
 
 

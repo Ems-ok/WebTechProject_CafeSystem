@@ -10,15 +10,8 @@ export function renderManagerDashboard(dashboardRoot) {
         </div>
       </div>
 
-      <div class="row g-4 mb-4">
-        ${renderStatCard('Today Sales', '$0.00', 'bi-cash-coin')}
-        ${renderStatCard('Orders', '0', 'bi-receipt')}
-        ${renderStatCard('Customers', '0', 'bi-people')}
-        ${renderStatCard('Low Stock', '0', 'bi-exclamation-triangle')}
-      </div>
-
       <div class="row g-4">
-        <div class="col-12">
+        <div class="col-md-8">
           <div class="card p-4">
             <div class="d-flex align-items-center justify-content-between mb-2">
               <h5 class="mb-0 fw-semibold">Quick Actions</h5>
@@ -27,25 +20,70 @@ export function renderManagerDashboard(dashboardRoot) {
             <div class="text-muted">Add actions here (new order, inventory update, reports, etc.).</div>
           </div>
         </div>
-      </div>
-    </div>
-  `;
-}
 
-function renderStatCard(title, value, icon) {
-    return `
-    <div class="col-12 col-sm-6 col-xl-3">
-      <div class="card p-4 h-100">
-        <div class="d-flex align-items-center justify-content-between">
-          <div>
-            <div class="text-muted small">${title}</div>
-            <div class="fs-4 fw-bold mt-1">${value}</div>
-          </div>
-          <div class="fs-3 text-muted">
-            <i class="bi ${icon}"></i>
-          </div>
+        <div class="col-md-4">
+           <div id="top-selling-widget-container">
+             </div>
         </div>
       </div>
     </div>
   `;
+
+    fetchTopSellingItems();
+}
+
+export async function fetchTopSellingItems() {
+    const container = document.getElementById('top-selling-widget-container');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="card shadow-sm">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Top 5 Best Selling Items</h5>
+            </div>
+            <div class="card-body" id="top-selling-content">
+                <div class="text-muted">Loading analytics...</div>
+            </div>
+        </div>
+    `;
+
+    try {
+        const response = await fetch('/api/orders/top-selling', {
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
+        });
+
+        if (response.ok) {
+            const topItems = await response.json();
+            renderTopFiveChart(topItems);
+        } else {
+            document.getElementById('top-selling-content').innerHTML = "Failed to load data.";
+        }
+    } catch (error) {
+        console.error("Error fetching top selling items:", error);
+    }
+}
+
+function renderTopFiveChart(items) {
+    const container = document.getElementById('top-selling-content');
+    if (!items || items.length === 0) {
+        container.innerHTML = "No sales data available.";
+        return;
+    }
+
+    container.innerHTML = items.map((item, index) => `
+        <div class="item-rank mb-3">
+            <div class="d-flex justify-content-between mb-1">
+                <span>#${index + 1} <strong>${item.name}</strong></span>
+                <small class="text-muted">${item.totalSold} Sold</small>
+            </div>
+            <div class="progress" style="height: 10px; background-color: #e9ecef;">
+                <div class="progress-bar bg-primary" role="progressbar" 
+                     style="width: ${item.percentage}%" 
+                     aria-valuenow="${item.percentage}" aria-valuemin="0" aria-valuemax="100">
+                </div>
+            </div>
+        </div>
+    `).join('');
 }
