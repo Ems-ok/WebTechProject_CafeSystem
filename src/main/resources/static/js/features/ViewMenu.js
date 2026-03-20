@@ -108,7 +108,7 @@ function renderMenuCard(menu) {
                     <h6 class="mb-0 fw-bold">${item.name}</h6>
                     <small class="text-muted d-block">${item.description || 'No description'}</small>
                 </div>
-                <span class="fw-bold text-success">$${item.price.toFixed(2)}</span>
+                <span class="fw-bold text-success">€${item.price.toFixed(2)}</span>
             </div>
         `).join('')
         : '<p class="text-muted italic">No items added yet.</p>';

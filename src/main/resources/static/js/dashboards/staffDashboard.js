@@ -38,7 +38,7 @@ export async function renderStaffDashboard(dashboardRoot) {
                         <div class="p-3 border rounded-3 bg-light">
                           <div class="d-flex justify-content-between">
                             <h6 class="fw-bold mb-1">${item.name}</h6>
-                            <span class="text-success fw-bold">$${item.price.toFixed(2)}</span>
+                            <span class="text-success fw-bold">€${item.price.toFixed(2)}</span>
                           </div>
                           <small class="text-muted">${item.category}</small>
                         </div>

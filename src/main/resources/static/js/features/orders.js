@@ -58,7 +58,7 @@ function initOrderTable() {
             { data: 'ordername' },
             {
                 data: 'totalAmount',
-                render: (data) => `$${data.toFixed(2)}`
+                render: (data) => `€${data.toFixed(2)}`
             },
             {
                 data: 'orderTimestamp',
