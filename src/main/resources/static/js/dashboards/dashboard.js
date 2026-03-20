@@ -33,7 +33,7 @@ function getUserRole() {
     } catch (e) {
         console.error("JWT Parsing Error:", e);
         return null;
-    }
+    }76353d71deff49ae89f1a2c99a6ec979
 }
 
 export function renderDashboard(mainAppDiv) {
@@ -61,7 +61,7 @@ export function renderDashboard(mainAppDiv) {
                         </li>
                         <li class="nav-item role-restricted" data-allowed="STAFF">
                             <a class="nav-link" href="#" id="staff-dashboard">
-                                <i class="bi bi-speedometer2 me-2"></i> Staff Portal
+                                <i class="bi bi-speedometer2 me-2"></i> Staff Dashboard
                             </a>
                         </li>
                     
