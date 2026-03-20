@@ -33,7 +33,7 @@ function getUserRole() {
     } catch (e) {
         console.error("JWT Parsing Error:", e);
         return null;
-    }76353d71deff49ae89f1a2c99a6ec979
+    }
 }
 
 export function renderDashboard(mainAppDiv) {
