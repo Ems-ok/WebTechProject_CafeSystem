@@ -1,6 +1,7 @@
 package com.mase.cafe.system.controllers;
 
 import com.mase.cafe.system.dtos.OrderDTO;
+import com.mase.cafe.system.dtos.TopSellingItemDTO;
 import com.mase.cafe.system.models.Order;
 import com.mase.cafe.system.repositories.OrderRepository;
 import com.mase.cafe.system.services.OrderService;
@@ -25,7 +26,6 @@ public class OrderController {
     public ResponseEntity<?> createOrder(@RequestBody Order order, Principal principal) {
         try {
             Order savedOrder = orderService.saveOrder(order, principal.getName());
-            // Return DTO to prevent infinite recursion crash
             return ResponseEntity.status(201).body(orderService.convertToDTO(savedOrder));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(e.getMessage());
@@ -75,5 +75,10 @@ public class OrderController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/top-selling")
+    public List<TopSellingItemDTO> getTopSelling() {
+        return orderService.getTopSellingItems();
     }
 }
