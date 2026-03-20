@@ -81,7 +81,7 @@ export async function renderMenuView(container) {
 
                 if (isExactId) return true;
 
-                if (!isNaN(searchTerm) && searchTerm.length < 3) {
+                if (!Number.isNaN(searchTerm) && searchTerm.length < 3) {
                     return isExactId;
                 }
 

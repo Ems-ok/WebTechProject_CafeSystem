@@ -5,9 +5,7 @@ import static org.mockito.Mockito.*;
 
 import com.mase.cafe.system.dtos.OrderDTO;
 import com.mase.cafe.system.models.Order;
-import com.mase.cafe.system.models.User;
 import com.mase.cafe.system.repositories.OrderRepository;
-import com.mase.cafe.system.repositories.UserRepository;
 import com.mase.cafe.system.services.OrderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

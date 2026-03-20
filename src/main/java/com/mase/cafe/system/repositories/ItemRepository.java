@@ -1,6 +1,5 @@
 package com.mase.cafe.system.repositories;
 
-import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import com.mase.cafe.system.models.Item;

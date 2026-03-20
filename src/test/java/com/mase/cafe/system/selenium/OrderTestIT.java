@@ -12,7 +12,7 @@ import java.time.Duration;
 import static org.junit.jupiter.api.Assertions.*;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class OrderTestIT {
+class OrderTestIT {
 
     private WebDriver driver;
     private WebDriverWait wait;

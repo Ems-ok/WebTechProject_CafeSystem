@@ -80,7 +80,7 @@ function initOrderTable() {
 
 function calculateTotal() {
     const itemName = $('#ordername').val();
-    const quantity = parseInt($('#quantity').val()) || 0;
+    const quantity = Number.parseInt($('#quantity').val()) || 0;
     const selectedItem = menuItems.find(item => item.name === itemName);
 
     if (selectedItem && quantity > 0) {
@@ -135,8 +135,8 @@ function bindOrderEvents() {
     $('#saveOrderBtn').off('click').on('click', function () {
         const id = $('#orderId').val();
         const itemName = $('#ordername').val();
-        const quantity = parseInt($('#quantity').val());
-        const totalDisplay = parseFloat($('#totalAmount').val());
+        const quantity = Number.parseInt($('#quantity').val());
+        const totalDisplay = Number.parseFloat($('#totalAmount').val());
 
         const orderData = {
             ordername: "Order for " + itemName,
@@ -149,7 +149,7 @@ function bindOrderEvents() {
             ]
         };
 
-        if (!itemName || isNaN(quantity) || quantity <= 0 || totalDisplay <= 0) {
+        if (!itemName || Number.isNaN(quantity) || quantity <= 0 || totalDisplay <= 0) {
             alert("Please select an item and a valid quantity.");
             return;
         }
