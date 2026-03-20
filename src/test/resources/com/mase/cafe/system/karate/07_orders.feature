@@ -2,7 +2,8 @@ Feature: Order Management API
 
   Background:
     * url baseUrl
-    * header Authorization = 'Bearer ' + authToken
+    * def loginResult = call read('classpath:com/mase/cafe/system/karate/03_login_success.feature')
+    * def jwtToken = loginResult.token
 
   Scenario: Create a new order and verify it exists
     Given path 'orders'
